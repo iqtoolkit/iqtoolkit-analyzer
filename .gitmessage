@@ -1,0 +1,32 @@
+# Git Commit Message Template
+
+# <type>(<scope>): <subject>
+# |<----  Using a Maximum Of 50 Characters  ---->|
+
+# Explain why this change is being made
+# |<----   Try To Limit Each Line to a Maximum Of 72 Characters   ---->|
+
+# --- COMMIT END ---
+# Type can be 
+#    feat     (new feature)
+#    fix      (bug fix)
+#    refactor (refactoring production code)
+#    style    (formatting, missing semi colons, etc; no code change)
+#    docs     (changes to documentation)
+#    test     (adding or refactoring tests; no production code change)
+#    chore    (updating grunt tasks etc; no production code change)
+# --------------------
+# Database Support:
+# ✅ PostgreSQL: Current focus (v0.1.5+)
+# 🔄 MySQL: Planned for v0.4.0 (Q3 2026)
+# 🔄 SQL Server: Planned for v0.4.0 (Q3 2026)
+# ❌ NOT planned: Oracle support
+# --------------------
+# Remember to:
+# - Capitalize subject line
+# - Use imperative mood in subject line
+# - Do not end subject line with a period
+# - Separate subject from body with a blank line
+# - Use the body to explain what and why vs. how
+# - Can use multiple lines with "-" for bullet points in body
+# --------------------

@@ -1,6 +1,8 @@
 # 🩺 Slow Query Doctor
 
-An intelligent PostgreSQL performance analyzer that uses AI to diagnose slow queries and provide actionable optimization recommendations.
+An intelligent database performance analyzer that uses AI to diagnose slow queries and provide actionable optimization recommendations.
+
+> **Note**: Currently focused on PostgreSQL, with MySQL and SQL Server support planned for upcoming releases. This tool is designed with a database-agnostic architecture to support multiple database engines in the future.
 
 ![Python](https://img.shields.io/badge/python-3.11+-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
@@ -25,7 +27,8 @@ An intelligent PostgreSQL performance analyzer that uses AI to diagnose slow que
   - [Why .txt Extension?](#why-txt-extension)
   - [Sample Data Features](#sample-data-features)
   - [Sample Query Types Included](#sample-query-types-included)
-- [Project Architecture](#-project-architecture)
+- [Architecture](#-architecture)
+  - [Technical Design](docs/ARCHITECTURE.md)
   - [Data Flow](#data-flow)
 - [Configuration](#-configuration)
   - [PostgreSQL Setup](#postgresql-setup)
@@ -54,13 +57,21 @@ Slow Query Doctor automatically analyzes your PostgreSQL slow query logs and pro
 
 ### Key Features
 
-- 🔍 **Smart Log Parsing**: Extracts slow queries from PostgreSQL logs, now supports multi-line queries and unusual characters
+- 🔍 **Smart Log Parsing**: Extracts slow queries from database logs with multi-line and special character support
+  - Currently optimized for PostgreSQL logs
+  - Extensible architecture for future MySQL and SQL Server support
 - 📊 **Impact Analysis**: Calculates query impact using duration × frequency scoring
-- 🤖 **AI-Powered Recommendations**: Uses OpenAI GPT to provide specific optimization advice
+- 🤖 **AI-Powered Recommendations**: Uses AI models to provide specific optimization advice
+  - Local execution with Ollama (v0.2.0+)
+  - Database-specific optimization knowledge
 - 📝 **Comprehensive Reports**: Generates detailed Markdown reports with statistics and recommendations
-- 📂 **Sample Data Included**: Ready-to-use sample log files for testing and demonstration
+- 📂 **Sample Data**: Ready-to-use sample log files for testing and demonstration
 - 🗂️ **Multiple Log Formats**: Supports plain, CSV, and JSON log formats
 - ⚙️ **Config File Support**: Use a `.slowquerydoctor.yml` file to customize analysis options
+- 🔄 **Database Agnostic Design**: Core architecture ready for multi-database support
+  - v0.2.0: PostgreSQL focus
+  - v0.4.0: MySQL support
+  - v0.4.1: SQL Server support
 
 ## 🚀 Quick Start
 
@@ -163,20 +174,29 @@ Sample log files use the `.txt` extension instead of `.log` to prevent them from
    - Complex mathematical calculations (`SQRT`, `SIN`, `COS`, `LOG`)
    - Heavy sorting and partitioning operations
 
-## 🏗️ Project Architecture
+## 🏗️ Architecture
+
+For detailed architecture documentation, including design principles, deployment models, and technical components, see [Architecture Documentation](docs/ARCHITECTURE.md).
 
 ```
 slow-query-doctor/
-├── slowquerydoctor/          # Main package
-│   ├── __init__.py          # Package interface
-│   ├── parser.py            # Log file parsing
-│   ├── analyzer.py          # Query analysis & scoring
-│   ├── llm_client.py        # AI/OpenAI integration
-│   └── report_generator.py  # Markdown report generation
-├── sample_logs/             # Sample PostgreSQL log files
-│   └── postgresql-2025-10-28_192816.log.txt  # Real slow query examples
-├── requirements.txt         # Python dependencies
-└── README.md               # This file
+├── api/                    # FastAPI backend (v0.2.0+)
+│   ├── app/               # API application
+│   │   ├── core/         # Core components
+│   │   ├── models/       # Pydantic models
+│   │   ├── routers/      # API endpoints
+│   │   └── services/     # Business logic
+├── slowquerydoctor/       # Main package
+│   ├── __init__.py       # Package interface
+│   ├── parser.py         # Log file parsing
+│   ├── analyzer.py       # Query analysis & scoring
+│   ├── llm_client.py     # Ollama/OpenAI integration
+│   └── report_generator.py # Report generation
+├── sample_logs/          # Sample PostgreSQL log files
+├── docs/                 # Documentation
+│   ├── ARCHITECTURE.md   # Technical design
+│   └── *.md             # Other docs
+└── README.md            # This file
 ```
 
 ### Data Flow

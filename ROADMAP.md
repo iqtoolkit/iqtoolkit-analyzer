@@ -1,6 +1,6 @@
 # 🚦 Slow Query Doctor Roadmap
 
-## Current Release: v0.1.1
+## Current Release: v0.1.5
 
 - PostgreSQL slow query log parsing
 - Query normalization and grouping
@@ -8,13 +8,16 @@
 - GPT-4 powered optimization recommendations
 - Markdown report generation
 - Docker containerization
+- Support for different PostgreSQL log formats (plain, CSV, JSON)
+- Configuration file support (.slowquerydoctor.yml)
+- Multi-line query parsing and special character handling
+- Improved error messages and user guidance
 
 ---
 
+## v0.1.x - Completed (November 2025)
 
-## v0.1.x - Polish & Bug Fixes (November 2025)
-
-**Focus:** Improve v1 based on real user feedback
+**Focus:** Building a solid foundation with OpenAI integration
 
 - [x] Add better sample outputs showing diverse query patterns
 - [x] Improve recommendation quality (distinguish between missing indexes, query rewrites, schema changes)
@@ -23,23 +26,37 @@
 - [x] Add support for different PostgreSQL log formats (plain, CSV, JSON)
 - [x] Improve error messages and user guidance
 - [x] Add configuration file support (.slowquerydoctor.yml)
+- [x] Release v0.1.5 as stable foundation
 
 ---
 
+## v0.2.0 - Privacy & API Support (Q1 2026)
 
-## v0.2.0 - Enhanced Analysis (Q1 2026)
+**Focus:** Privacy-focused analysis and API integration
 
-**Focus:** Deeper query analysis and better insights
-
-- [ ] Add EXPLAIN plan analysis integration
-- [ ] Show table/index statistics when available
-- [ ] Detect common anti-patterns (N+1, missing joins, etc.)
-- [ ] Add query complexity scoring
-- [ ] Support for analyzing multiple log files at once
-- [ ] Generate comparison reports (before/after optimization)
-- [ ] Add HTML report generation
-- [ ] Export to JSON/CSV for further analysis
-- [ ] Expand config file options and log format auto-detection
+- [ ] Replace OpenAI with Ollama for enhanced privacy
+  - Support configurable OpenAI URL/endpoint for enterprise users
+  - Support both OpenAI and Ollama backends
+- [ ] Add FastAPI web service layer
+  - REST API endpoints for query analysis
+  - Streaming analysis support
+  - File upload handling
+  - Background task processing
+  - Rate limiting and API key auth
+  - Swagger/OpenAPI documentation
+- [ ] Enhanced analysis features
+  - EXPLAIN plan analysis integration
+  - Common anti-pattern detection
+  - Query complexity scoring
+  - Multi-file log analysis
+  - Before/after comparison reports
+  - HTML report generation
+  - JSON/CSV export options
+- [ ] Docker deployment
+  - Docker Compose setup
+  - Ollama container integration
+  - Production configuration
+  - GPU support (optional)
 
 ---
 
@@ -63,10 +80,19 @@
 **Focus:** Expand beyond PostgreSQL
 
 - [ ] MySQL slow query log support
+  - Slow query log parsing
+  - Performance schema integration
+  - MySQL-specific recommendations
 - [ ] SQL Server Extended Events support
-- [ ] Oracle AWR report integration
-- [ ] Database-agnostic query analysis
+  - XEvents log parsing
+  - DMV integration
+  - SQL Server-specific optimizations
+- [ ] Database-agnostic query analysis layer
 - [ ] Cross-database performance comparison
+- [ ] Multi-format log handling
+- [ ] Database-specific index recommendations
+
+> **Note**: Focusing on PostgreSQL (v0.2.0), MySQL, and SQL Server—the most common enterprise databases. Oracle support is not planned as it requires significantly different log formats and dedicated engineering resources.
 
 ---
 
