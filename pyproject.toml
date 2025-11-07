@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "slow-query-doctor"
 version = "0.1.5"
-description = "AI-powered database performance analyzer that diagnoses slow queries and provides actionable optimization recommendations (currently focused on PostgreSQL)"
+description = "AI-powered PostgreSQL performance analyzer that diagnoses slow queries and provides actionable optimization recommendations"
 readme = "README.md"
 license = {text = "MIT"}
 authors = [

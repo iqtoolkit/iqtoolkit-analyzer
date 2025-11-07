@@ -35,28 +35,16 @@
 **Focus:** Privacy-focused analysis and API integration
 
 - [ ] Replace OpenAI with Ollama for enhanced privacy
-  - Support configurable OpenAI URL/endpoint for enterprise users
-  - Support both OpenAI and Ollama backends
 - [ ] Add FastAPI web service layer
-  - REST API endpoints for query analysis
-  - Streaming analysis support
-  - File upload handling
-  - Background task processing
-  - Rate limiting and API key auth
-  - Swagger/OpenAPI documentation
-- [ ] Enhanced analysis features
-  - EXPLAIN plan analysis integration
-  - Common anti-pattern detection
-  - Query complexity scoring
-  - Multi-file log analysis
-  - Before/after comparison reports
-  - HTML report generation
-  - JSON/CSV export options
-- [ ] Docker deployment
-  - Docker Compose setup
-  - Ollama container integration
-  - Production configuration
-  - GPU support (optional)
+- [ ] Add REST API endpoints for query analysis
+- [ ] Add Swagger/OpenAPI documentation
+- [ ] Add EXPLAIN plan analysis integration
+- [ ] Detect common anti-patterns (N+1, missing joins, etc.)
+- [ ] Add query complexity scoring
+- [ ] Support for analyzing multiple log files at once
+- [ ] Generate comparison reports (before/after optimization)
+- [ ] Add HTML report generation
+- [ ] Export to JSON/CSV for further analysis
 
 ---
 
@@ -80,19 +68,10 @@
 **Focus:** Expand beyond PostgreSQL
 
 - [ ] MySQL slow query log support
-  - Slow query log parsing
-  - Performance schema integration
-  - MySQL-specific recommendations
 - [ ] SQL Server Extended Events support
-  - XEvents log parsing
-  - DMV integration
-  - SQL Server-specific optimizations
-- [ ] Database-agnostic query analysis layer
+- [ ] Oracle AWR report integration
+- [ ] Database-agnostic query analysis
 - [ ] Cross-database performance comparison
-- [ ] Multi-format log handling
-- [ ] Database-specific index recommendations
-
-> **Note**: Focusing on PostgreSQL (v0.2.0), MySQL, and SQL Server—the most common enterprise databases. Oracle support is not planned as it requires significantly different log formats and dedicated engineering resources.
 
 ---
 
