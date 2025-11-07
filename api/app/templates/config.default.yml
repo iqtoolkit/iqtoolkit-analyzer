@@ -19,15 +19,31 @@ security:
 
 # AI/LLM Configuration
 llm:
+  # Primary provider for query analysis
   provider: "ollama"  # Options: ollama, openai
+  
+  # OpenAI Configuration (v0.1.5 compatible)
+  openai:
+    enabled: true  # Set to false to disable OpenAI completely
+    api_key: ""  # Set in environment or actual config file
+    base_url: "https://api.openai.com/v1"  # Custom endpoint support
+    model: "gpt-4"  # Model to use
+    timeout: 300
+    fallback: true  # Use as fallback if Ollama fails
+  
+  # Ollama Configuration (v0.2.0+)
   ollama:
+    enabled: true
     base_url: "http://localhost:11434"
     model: "llama2:13b"
     timeout: 300
-  openai:
-    base_url: "https://api.openai.com/v1"
-    model: "gpt-4"
-    timeout: 300
+    retry_count: 3  # Number of retries before falling back to OpenAI (if configured)
+    
+  # Common settings
+  cache_results: true  # Cache analysis results
+  cache_ttl_hours: 24  # Cache duration
+  max_tokens: 2000     # Maximum tokens for response
+  temperature: 0.1     # Lower for more consistent results
 
 # Analysis Configuration
 analysis:
