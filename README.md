@@ -161,9 +161,9 @@ pip install -e .[dev,test]
 
 #### AI Provider Setup (Both Options)
 
-**Option A: Ollama (Recommended - Local, private, no API key needed) ⭐**
+**Option A: Ollama (Recommended - Local or remote, private, no API key needed) ⭐**
 ```bash
-# Quick setup (see docs/5-minute-ollama-setup.md for details)
+# Local setup (see docs/5-minute-ollama-setup.md for details)
 curl -LsSf https://ollama.com/install.sh | sh
 ollama serve
 ollama pull a-kore/Arctic-Text2SQL-R1-7B  # SQL-specialized model (recommended)
@@ -171,6 +171,11 @@ ollama pull a-kore/Arctic-Text2SQL-R1-7B  # SQL-specialized model (recommended)
 # Copy example config and customize
 cp .iqtoolkit-analyzer.yml.example .iqtoolkit-analyzer.yml
 # Edit: set llm_provider: ollama
+
+# OR use remote Ollama server
+export OLLAMA_HOST=http://your-server-ip:11434
+# Or add to .iqtoolkit-analyzer.yml:
+#   ollama_host: http://your-server-ip:11434
 ```
 
 **Option B: OpenAI (Cloud, requires API key)**
@@ -179,7 +184,7 @@ export OPENAI_API_KEY="your-openai-api-key-here"
 # Config will use OpenAI by default if no .iqtoolkit-analyzer.yml exists
 ```
 
-> **💡 Tip**: Ollama runs completely locally—your queries never leave your machine. Perfect for sensitive production data. See [Ollama Local Setup](docs/ollama-local.md) for details.
+> **💡 Tip**: Ollama can run locally or on a remote server—your queries stay within your infrastructure. Perfect for sensitive production data. See [Ollama Setup Guide](docs/ollama-local.md) for local and remote configuration details.
 
 ### Basic Usage
 
