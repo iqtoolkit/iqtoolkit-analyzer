@@ -1,4 +1,4 @@
-# 🚀 5-Minute Ollama Setup for Slow Query Doctor
+# 🚀 5-Minute Ollama Setup for IQToolkit Analyzer
 
 Get Ollama running locally in 5 minutes for private AI analysis of your database logs.
 

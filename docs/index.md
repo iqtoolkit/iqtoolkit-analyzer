@@ -2,9 +2,9 @@
 
 ![Python](https://img.shields.io/badge/python-3.11+-blue.svg)
 
-# 📚 Slow Query Doctor Documentation
+# 📚 IQToolkit Analyzer Documentation
 
-**Slow Query Doctor** is an AI-powered tool for analyzing PostgreSQL and MongoDB slow query logs. It helps you:
+**IQToolkit Analyzer** is an AI-powered tool for analyzing PostgreSQL and MongoDB slow query logs. It helps you:
 - **PostgreSQL**: Parse and summarize slow query logs (plain, CSV, or JSON)
 - **MongoDB**: Real-time profiler integration for live slow query detection
 - Identify the slowest and most frequent queries
