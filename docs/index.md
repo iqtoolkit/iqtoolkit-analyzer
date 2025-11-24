@@ -24,7 +24,8 @@
 - [Release Process & Versioning](release-process.md)
 - [Configuration Guide](configuration.md)
 - [🚀 5-Minute Ollama Setup](5-minute-ollama-setup.md) ⭐ **New!**
-- [Ollama Local Setup (Detailed)](ollama-local.md)
+- [Ollama Local & Remote Setup](ollama-local.md)
+- [🔬 Remote Ollama Testing Guide](remote-ollama-testing.md) ⭐ **New!**
 - [OpenAI Setup](https://platform.openai.com/docs/guides/authentication)
 - [FAQ & Troubleshooting](faq.md)
 
@@ -39,7 +40,8 @@
 - [FAQ & Troubleshooting](faq.md)
 - [Setup & Usage Examples (PostgreSQL)](pg_examples.md)
 - [MongoDB Guide](mongodb-guide.md) ⭐ **New!**
-- [Ollama Local Setup](ollama-local.md)
+- [Ollama Local & Remote Setup](ollama-local.md)
+- [🔬 Remote Ollama Testing Guide](remote-ollama-testing.md) ⭐ **New!**
 - [OpenAI Setup](https://platform.openai.com/docs/guides/authentication)
 
 ---

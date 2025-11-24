@@ -14,6 +14,11 @@ Welcome to the Iqtoolkit Analyzer documentation! This guide helps you navigate a
 - [**FAQ**](docs/faq.md) - Frequently asked questions and troubleshooting
 - [**Sample Data**](docs/sample-data.md) - Test data and example log files
 
+### **AI Provider Setup**
+- [**Ollama Local Setup**](docs/ollama-local.md) - Local and remote Ollama installation guide
+- [**5-Minute Ollama Setup**](docs/5-minute-ollama-setup.md) - Quick start guide for Ollama
+- [**Remote Ollama Testing**](docs/remote-ollama-testing.md) - Distributed Ollama deployment and testing guide
+
 ## 🤝 **Contributing & Development**
 
 ### **For Contributors**
@@ -75,6 +80,9 @@ make dev-check         # Full development workflow
 
 #### **Use the Tool**
 → Start with [README.md](README.md) → [Getting Started](docs/getting-started.md) → [PostgreSQL Examples](docs/pg_examples.md)
+
+#### **Set up AI Provider (Ollama)**
+→ Quick start: [5-Minute Setup](docs/5-minute-ollama-setup.md) → Detailed: [Ollama Local Setup](docs/ollama-local.md) → Remote: [Remote Ollama Testing](docs/remote-ollama-testing.md)
 
 #### **Contribute Code**
 → Read [CONTRIBUTING.md](CONTRIBUTING.md) → [VERSION_MANAGEMENT.md](VERSION_MANAGEMENT.md) → [ARCHITECTURE.md](ARCHITECTURE.md)
