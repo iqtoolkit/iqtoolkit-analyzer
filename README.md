@@ -295,15 +295,17 @@ Sample log files use the `.txt` extension instead of `.log` to prevent them from
 ## 🏗️ Project Architecture
 
 ```
-slow-query-doctor/
+iqtoolkit-analyzer/
 ├── iqtoolkit_analyzer/       # Main package
 │   ├── __init__.py          # Package interface
 │   ├── parser.py            # Log file parsing
 │   ├── analyzer.py          # Query analysis & scoring
 │   ├── llm_client.py        # AI/OpenAI integration
 │   └── report_generator.py  # Markdown report generation
-├── sample_logs/             # Sample PostgreSQL log files
-│   └── postgresql-2025-10-28_192816.log.txt  # Real slow query examples
+├── docs/
+│   └── sample_logs/         # Sample database log files
+│       ├── postgresql/      # PostgreSQL examples
+│       └── mongodb/         # MongoDB examples
 ├── requirements.txt         # Python dependencies
 └── README.md               # This file
 ```
