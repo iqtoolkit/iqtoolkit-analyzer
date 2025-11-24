@@ -62,7 +62,7 @@ An intelligent database performance analyzer that uses AI to diagnose slow queri
 
 ## 🎯 Overview
 
-Slow Query Doctor automatically analyzes your **PostgreSQL** and **MongoDB** slow query logs and provides intelligent, AI-powered optimization recommendations. It identifies performance bottlenecks, calculates impact scores, and generates detailed reports with specific suggestions for improving database performance.
+IQToolkit Analyzer automatically analyzes your **PostgreSQL** and **MongoDB** slow query logs and provides intelligent, AI-powered optimization recommendations. It identifies performance bottlenecks, calculates impact scores, and generates detailed reports with specific suggestions for improving database performance.
 
 ### 🗄️ **Database & AI Support Status**
 
@@ -115,7 +115,7 @@ Slow Query Doctor automatically analyzes your **PostgreSQL** and **MongoDB** slo
 ## 🚀 Quick Start
 
 > **⚡ Ready to analyze PostgreSQL or MongoDB slow queries right now?** Follow the installation below.  
-> **🔮 Planning for MySQL/SQL Server?** [Join the early feedback program](https://github.com/iqtoolkit/slow-query-doctor/discussions) to shape v0.4.0 development!
+> **🔮 Planning for MySQL/SQL Server?** [Join the early feedback program](https://github.com/iqtoolkit/iqtoolkit-analyzer/discussions) to shape v0.4.0 development!
 
 ### Installation
 
@@ -142,8 +142,8 @@ make setup
 
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/iqtoolkit/slow-query-doctor.git
-cd slow-query-doctor
+git clone https://github.com/iqtoolkit/iqtoolkit-analyzer.git
+cd iqtoolkit-analyzer
 ```
 
 2. **Create virtual environment:**
@@ -252,8 +252,8 @@ The `docs/sample_logs/` directory contains database slow query log examples for 
 - **SQL Server**: Placeholder directory with Extended Events samples and configuration → [View samples](docs/sample_logs/sqlserver/)
 
 > 🎯 **Early Feedback Opportunities**: 
-> - **MySQL Users**: [Share your slow query log formats and challenges](https://github.com/iqtoolkit/slow-query-doctor/issues/new?labels=mysql-feedback&title=MySQL%20Requirements)
-> - **SQL Server DBAs**: [Tell us about your Extended Events setup and pain points](https://github.com/iqtoolkit/slow-query-doctor/issues/new?labels=sqlserver-feedback&title=SQL%20Server%20Requirements)
+> - **MySQL Users**: [Share your slow query log formats and challenges](https://github.com/iqtoolkit/iqtoolkit-analyzer/issues/new?labels=mysql-feedback&title=MySQL%20Requirements)
+> - **SQL Server DBAs**: [Tell us about your Extended Events setup and pain points](https://github.com/iqtoolkit/iqtoolkit-analyzer/issues/new?labels=sqlserver-feedback&title=SQL%20Server%20Requirements)
 
 ### Available Sample Files
 
