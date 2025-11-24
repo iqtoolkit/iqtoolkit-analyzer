@@ -2,7 +2,7 @@
 # Production-ready Docker image with minimal size and security best practices
 
 # Stage 1: Build stage
-FROM python:3.11-slim AS builder
+FROM python:3.14-slim AS builder
 
 # Set environment variables for build
 ENV PYTHONUNBUFFERED=1 \
@@ -31,7 +31,7 @@ WORKDIR /app
 RUN pip install --no-cache-dir .
 
 # Stage 2: Production stage
-FROM python:3.11-slim AS production
+FROM python:3.14-slim AS production
 
 # Set environment variables for production
 ENV PYTHONUNBUFFERED=1 \
