@@ -36,89 +36,104 @@
 
 ---
 
-## v0.2.2a1 - MongoDB Support (Nov 2025) ✅ ALPHA READY
+## v0.2.2 - MongoDB Support + AI Provider Flexibility (Nov 2025) ✅ STABLE
 
-**Focus:** MongoDB slow query analysis and reporting
+**Focus:** MongoDB slow query analysis and configurable AI providers
 
-**🚨 MONGODB FEATURES COMPLETE**
+**🎉 SHIPPED FEATURES**
 - ✅ **MongoDB slow query analyzer** with profiler integration
 - ✅ **MongoDB query pattern recognition** and normalization
 - ✅ **Enhanced configuration system** (expanded YAML configuration with MongoDB support)
 - ✅ **HTML report generation** (interactive dashboards with MongoDB-specific insights)
 - ✅ **Multi-format reporting** (JSON, Markdown, HTML)
 - ✅ **CLI integration** with database-specific subcommands
-- ✅ **Production integration test** script for validation
+- ✅ **Configurable AI providers** (Ollama + OpenAI) - **SHIPPED EARLY** 🚀
+- ✅ **Privacy-first AI** with local Ollama support (enterprise-ready)
+- ✅ **Flexible model configuration** (custom hosts, multiple models)
 
-**Features:**
+**Complete Feature List:**
 - [x] **MongoDB slow query analyzer** (complete with profiler integration)
 - [x] **Enhanced configuration system** (expanded .iqtoolkit-analyzer.yml options)
 - [x] **HTML report generation** (interactive dashboards)
 - [x] **Multi-file analysis** (batch processing)
-- [ ] **MongoDB aggregation pipeline optimization** → v0.2.3
-- [ ] **MongoDB indexing recommendations** → v0.2.3
+- [x] **Ollama integration** (arctic-text2sql-r1:7b default model)
+- [x] **OpenAI integration** (gpt-4o-mini default model)
+- [x] **Configurable LLM providers** via LLMConfig
+- [x] **Custom Ollama host support** for self-hosted deployments
 
 ---
 
-## v0.2.3 - Enhanced MongoDB Analysis (Q1 2026) 📋 PLANNED
+## v0.2.3 - PostgreSQL EXPLAIN + MongoDB Enhancements (Q1 2026) 🎯 NEXT
 
-**Focus:** Advanced MongoDB optimization features
+**Focus:** Advanced query plan analysis and MongoDB optimization
 
+**PostgreSQL EXPLAIN Analyzer (RFC-002):**
+- [ ] **EXPLAIN plan parser** (JSON/YAML formats)
+- [ ] **Execution metrics extraction** (performance, I/O, estimation accuracy)
+- [ ] **Anti-pattern detection** (seq scans, inefficient joins, poor filters)
+- [ ] **Index recommendations** from EXPLAIN analysis
+- [ ] **Unified reporting** (integrate EXPLAIN insights into existing reports)
+- [ ] **LLM-powered insights** for complex execution plans
+- [ ] **PostgreSQL 9.6-16 support** with version-specific handling
+
+**MongoDB Enhancements:**
 - [ ] **MongoDB aggregation pipeline optimization** recommendations
 - [ ] **MongoDB indexing strategy** analysis and suggestions
 - [ ] **Query complexity scoring and classification**
-- [ ] **Enhanced anti-pattern detection engine**
+- [ ] **Enhanced anti-pattern detection** for MongoDB-specific issues
+
+**Developer Experience:**
+- [ ] **FastAPI backend** for programmatic access (optional REST API)
+- [ ] **Improved error messages** and troubleshooting guides
+- [ ] **Performance benchmarks** and optimization documentation
 
 ---
 
-## v0.2.4 - Flexible AI Providers (Q1 2026) 📋 PLANNED
+## v0.3.0 - MySQL & SQL Server Support (Q2 2026) 📋 PLANNED
 
-**Focus:** Enterprise-grade AI provider flexibility
+**Focus:** Expand to traditional SQL databases (moved up from v0.4.0)
 
-**🚨 AI PROVIDER FLEXIBILITY**
-- Database logs = sensitive business data
-- **Default: Ollama** (local, private, enterprise-safe)
-- **Optional: OpenAI** (configurable for non-sensitive environments)
-- **Future-ready**: Pluggable architecture for multiple AI providers
+**MySQL Support:**
+- [ ] **MySQL slow query log parser** (standard and JSON formats)
+- [ ] **MySQL-specific anti-patterns** (covering indexes, table scans, temp tables)
+- [ ] **InnoDB-specific optimizations** (buffer pool, transaction isolation)
+- [ ] **MySQL EXPLAIN analysis** (including EXPLAIN FORMAT=JSON)
 
-- [ ] **Configurable AI providers** (Ollama default, OpenAI optional)
-- [ ] **Flexible model configuration** (custom endpoints, multiple models)
-- [ ] Add EXPLAIN plan analysis integration (PostgreSQL)
-- [ ] FastAPI backend for programmatic access
+**SQL Server Support:**
+- [ ] **Extended Events parser** (query performance tracking)
+- [ ] **Query Store integration** (if available)
+- [ ] **SQL Server execution plan analysis** (XML format)
+- [ ] **SQL Server-specific recommendations** (indexes, statistics, query hints)
+
+**Unified Features:**
+- [ ] **Cross-database performance comparison** (PostgreSQL + MongoDB + MySQL + SQL Server)
+- [ ] **Database-agnostic query analysis engine** (shared anti-pattern detection)
+- [ ] **Unified configuration** for multiple database types
+- [ ] **Comparison reports** (identify slowest queries across all databases)
 
 ---
 
-## v0.3.0 - Self-Learning & ML Intelligence (Q2 2026) 🚫 DO NOT START
+## v0.4.0 - Self-Learning & ML Intelligence (Q3 2026) 📋 PLANNED
 
 **Focus:** ML-based intelligence and historical tracking
 
-- [ ] Track query performance over time (historical database)
-- [ ] ML-based anomaly detection for new slow queries
-- [ ] Identify performance regression patterns
-- [ ] Confidence scoring for recommendations
-- [ ] Trend analysis (queries getting slower over time)
-- [ ] Automatic baseline detection
-- [ ] Predictive alerts for queries likely to become slow
-- [ ] Learn from user feedback (which recommendations worked)
+**Historical Analysis:**
+- [ ] **Track query performance over time** (SQLite/PostgreSQL storage)
+- [ ] **Trend analysis** (queries getting slower/faster over time)
+- [ ] **Automatic baseline detection** (establish normal performance)
+- [ ] **Performance regression detection** (alert on degradation)
 
----
+**Machine Learning:**
+- [ ] **ML-based anomaly detection** for new slow queries
+- [ ] **Identify performance regression patterns** (recurring issues)
+- [ ] **Confidence scoring** for recommendations (based on historical success)
+- [ ] **Predictive alerts** for queries likely to become slow
+- [ ] **Learn from user feedback** (which recommendations worked)
 
-## v0.4.0 - MySQL & SQL Server Support (Q3 2026)
-
-**Focus:** Traditional SQL databases (after MongoDB is stable)
-
-- [ ] **MySQL slow query log support**
-- [ ] **SQL Server Extended Events support**
-- [ ] Database-agnostic query analysis engine
-- [ ] Cross-database performance comparison (PostgreSQL + MongoDB + MySQL + SQL Server)
-- [ ] Unified configuration for multiple database types
-- [ ] Database-specific optimization recommendations
-
-**Early Feedback Collection:**
-- 📁 `docs/sample_logs/mysql/` - Configuration examples and feedback templates
-- 📁 `docs/sample_logs/sqlserver/` - Extended Events samples and feedback collection
-- 🎯 **Goal**: Collect real-world requirements before development starts
-
-**Note:** Oracle support not planned - focusing on PostgreSQL, MongoDB, MySQL, and SQL Server as the most common enterprise databases.
+**Integration:**
+- [ ] **CI/CD integration** (fail builds on performance regression)
+- [ ] **Prometheus/Grafana integration** (real-time monitoring)
+- [ ] **Alerting system** (Slack/Teams/email notifications)
 
 ---
 
@@ -161,15 +176,16 @@ Track feature requests from users here:
 
 | Version | Timeline | Status | Key Features |
 |---------|----------|--------|--------------|
-| v0.1.5 | ✅ SHIPPED | Mature | PostgreSQL analyzer with **OpenAI only** |
-| v0.1.6 | Nov 2025 | 🔒 Feature Freeze | **Final v0.1.x with new features** - Documentation, architecture, **OpenAI only** |
-| v0.1.7+ | Ongoing | 🐛 Bug Fixes Only | Critical fixes, **OpenAI only**, no new features |
-| v0.2.2a1 | Nov 2025 | ✅ Alpha Ready | **MongoDB support** - analyzer, profiler integration, multi-format reports, CLI, **OpenAI only** |
-| v0.2.3 | Q1 2026 | � Planned | **Enhanced MongoDB** - aggregation optimization, indexing recommendations |
-| v0.2.4 | Q1 2026 | 📋 Planned | **Configurable AI providers** (Ollama default, OpenAI optional), EXPLAIN plans, FastAPI |
-| v0.3.0 | Q2 2026 | 🚫 Do Not Start | ML/self-learning, anomaly detection |
-| v0.4.0 | Q3 2026 | 📋 Planned | **MySQL, SQL Server support** |
+| v0.1.5 | ✅ SHIPPED | Mature | PostgreSQL analyzer with OpenAI only |
+| v0.1.6 | ✅ SHIPPED | Mature | Final v0.1.x feature release, documentation |
+| v0.2.2 | ✅ **STABLE** | **Current** | **MongoDB + Ollama/OpenAI providers** 🚀 |
+| v0.2.3 | Q1 2026 | 🎯 Next | **PostgreSQL EXPLAIN analyzer + MongoDB enhancements** |
+| ~~v0.2.4~~ | ~~Q1 2026~~ | ❌ **Cancelled** | Features merged into v0.2.2 and v0.2.3 |
+| v0.3.0 | Q2 2026 | 📋 Planned | **MySQL + SQL Server support** (moved up) |
+| v0.4.0 | Q3 2026 | 📋 Planned | **ML/self-learning, anomaly detection** |
 | v1.0.0 | Q4 2026 | 📋 Planned | Web UI, enterprise features |
+
+**🎉 Ahead of Schedule:** v0.2.4's AI provider flexibility shipped **3 months early** in v0.2.2!
 
 ---
 
