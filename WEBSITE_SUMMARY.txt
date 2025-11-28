@@ -8,6 +8,7 @@ Current State (v0.2.2 — Stable)
 - Privacy-first defaults with local Ollama support
 - CLI ready; docs refreshed and aligned to current features
 - Tooling update: Removed legacy 'uv' references; standardized on Poetry and venv/pip
+- Contacts: All repo contact emails standardized to gio@iqtoolkit.ai
 
 Architecture Shift: Modular Monorepo
 - We moved from a single-package repo to a modular monorepo to enable faster iteration and clearer boundaries.
