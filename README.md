@@ -140,8 +140,19 @@ See [ROADMAP.md](ROADMAP.md) for the phase-by-phase plan.
 git clone https://github.com/iqtoolkit/iqtoolkit-analyzer.git
 cd iqtoolkit-analyzer
 
-# Install Poetry if needed
+# Install Poetry (pick one)
+## macOS (Homebrew)
+brew update && brew install poetry
+
+## macOS/Linux (Official installer)
 curl -sSL https://install.python-poetry.org | python3 -
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc && source ~/.zshrc
+
+## Windows (PowerShell)
+powershell -ExecutionPolicy Bypass -NoProfile -Command "(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -"
+
+## Cross-platform (pipx)
+pipx install poetry
 
 # Install dependencies for shared/contracts and services
 cd iqtoolkit-contracts && poetry install && cd -
@@ -149,7 +160,7 @@ cd iqtoolkit-iqai && poetry install && cd -
 cd iqtoolkithub && poetry install && cd -
 
 # Analyzer CLI (root package)
-poetry install
+poetry install --with dev,test
 ```
 
 #### Traditional Python (venv + pip)
@@ -620,7 +631,7 @@ cp /var/log/postgresql/postgresql.log ~/my_log.log
 
 ### Quick Development Setup
 ```bash
-# Clone and setup
+# Clone and setup (prefers Poetry, falls back to venv/pip)
 git clone https://github.com/iqtoolkit/iqtoolkit-analyzer.git
 cd iqtoolkit-analyzer
 make setup
