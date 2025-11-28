@@ -127,7 +127,7 @@ For maintainers, ensure all documentation stays current:
 - **Bug Reports**: [GitHub Issues](https://github.com/iqtoolkit/iqtoolkit-analyzer/issues) with `bug` label
 - **Feature Requests**: [GitHub Issues](https://github.com/iqtoolkit/iqtoolkit-analyzer/issues) with `feature` label
 - **Development Questions**: [GitHub Discussions](https://github.com/orgs/iqtoolkit/discussions)
-- **Direct Contact**: gio@gmartinez.net
+- **Direct Contact**: gio@iqtoolkit.ai
 
 ---
 

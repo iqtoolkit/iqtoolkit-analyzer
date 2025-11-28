@@ -683,7 +683,7 @@ else:
 **How to Provide Feedback:**
 - GitHub Discussions: https://github.com/iqtoolkit/iqtoolkit-analyzer/discussions
 - GitHub Issues: https://github.com/iqtoolkit/iqtoolkit-analyzer/issues
-- Email: team@iqtoolkit.dev
+- Email: gio@iqtoolkit.ai
 
 ---
 

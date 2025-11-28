@@ -19,7 +19,7 @@ We take the security of IQToolkit Analyzer seriously. If you believe you have fo
 - Disclose the vulnerability publicly before it has been addressed
 
 ### Please Do:
-1. **Email us directly** at security@iqtoolkit.ai with:
+1. **Email us directly** at gio@iqtoolkit.ai with:
    - A description of the vulnerability
    - Steps to reproduce the issue
    - Potential impact
@@ -129,7 +129,7 @@ When we receive a security bug report, we will:
 
 ## Contact
 
-- **Security Issues**: security@iqtoolkit.ai
+- **Security Issues**: gio@iqtoolkit.ai
 - **General Support**: [GitHub Issues](https://github.com/iqtoolkit/iqtoolkit-analyzer/issues)
 - **Maintainer**: Giovanni Martinez <gio@iqtoolkit.ai>
 

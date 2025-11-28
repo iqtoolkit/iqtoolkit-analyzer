@@ -186,7 +186,7 @@ In case of critical issues requiring immediate fixes:
 
 For questions about repository governance:
 - **GitHub Issues** - Technical questions about workflows
-- **Email** - gio@gmartinez.net for access/permission issues  
+- **Email** - gio@iqtoolkit.ai for access/permission issues  
 - **Discussions** - General questions about contribution process
 
 ---

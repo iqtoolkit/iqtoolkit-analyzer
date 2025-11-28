@@ -25,4 +25,4 @@ A: See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.
 A: See [ROADMAP.md](../ROADMAP.md).
 
 ### Q: How do I report a bug or request a feature?
-A: Open an issue on GitHub or email gio@gmartinez.net.
+A: Open an issue on GitHub or email gio@iqtoolkit.ai.

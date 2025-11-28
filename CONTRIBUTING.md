@@ -312,7 +312,7 @@ git push --tags
 
 ## Questions?
 
-Open an issue or email gio@gmartinez.net
+Open an issue or email gio@iqtoolkit.ai
 
 ---
 
