@@ -14,14 +14,17 @@ Welcome to the Iqtoolkit Analyzer documentation! This guide helps you navigate a
 - [**FAQ**](docs/faq.md) - Frequently asked questions and troubleshooting
 - [**Sample Data**](docs/sample-data.md) - Test data and example log files
 
+### **AI Provider Setup**
+- [**Ollama Local Setup**](docs/ollama-local.md) - Local and remote Ollama installation guide
+- [**5-Minute Ollama Setup**](docs/5-minute-ollama-setup.md) - Quick start guide for Ollama
+- [**Remote Ollama Testing**](docs/remote-ollama-testing.md) - Distributed Ollama deployment and testing guide
+
 ## 🤝 **Contributing & Development**
 
 ### **For Contributors**
 - [**CONTRIBUTING.md**](CONTRIBUTING.md) - Complete contributor guide with Git Flow, commit conventions, and review process
+- [**Development Environment Setup**](docs/dev-environment-setup.md) - Complete local dev setup (Ubuntu, Ollama, system requirements)
 - [**CODE_OF_CONDUCT.md**](CODE_OF_CONDUCT.md) - Community guidelines and standards
-- [**VERSION_MANAGEMENT.md**](VERSION_MANAGEMENT.md) - Automated version synchronization system
-
-### **For Repository Maintainers**
 - [**BRANCH_PROTECTION.md**](BRANCH_PROTECTION.md) - Repository governance and branch protection setup
 - [**ARCHITECTURE.md**](ARCHITECTURE.md) - System architecture and extension points
 - [**TECHNICAL_DEBT.md**](TECHNICAL_DEBT.md) - Known limitations and areas for improvement
@@ -40,6 +43,7 @@ source venv/bin/activate
 
 # Development commands (all require ./venv)
 make validate          # Check environment setup
+ - [**Monorepo Guide**](docs/monorepo.md) - Working with Poetry and path dependencies
 make setup             # Install deps + git hooks  
 make help              # See all available commands
 
@@ -75,6 +79,12 @@ make dev-check         # Full development workflow
 
 #### **Use the Tool**
 → Start with [README.md](README.md) → [Getting Started](docs/getting-started.md) → [PostgreSQL Examples](docs/pg_examples.md)
+
+#### **Set up Development Environment**
+→ [Dev Environment Setup](docs/dev-environment-setup.md) → [Ollama Setup](docs/ollama-local.md) → [Contributing Guide](CONTRIBUTING.md)
+
+#### **Set up AI Provider (Ollama)**
+→ Quick start: [5-Minute Setup](docs/5-minute-ollama-setup.md) → Detailed: [Ollama Local Setup](docs/ollama-local.md) → Remote: [Remote Ollama Testing](docs/remote-ollama-testing.md)
 
 #### **Contribute Code**
 → Read [CONTRIBUTING.md](CONTRIBUTING.md) → [VERSION_MANAGEMENT.md](VERSION_MANAGEMENT.md) → [ARCHITECTURE.md](ARCHITECTURE.md)
@@ -117,7 +127,7 @@ For maintainers, ensure all documentation stays current:
 - **Bug Reports**: [GitHub Issues](https://github.com/iqtoolkit/iqtoolkit-analyzer/issues) with `bug` label
 - **Feature Requests**: [GitHub Issues](https://github.com/iqtoolkit/iqtoolkit-analyzer/issues) with `feature` label
 - **Development Questions**: [GitHub Discussions](https://github.com/orgs/iqtoolkit/discussions)
-- **Direct Contact**: gio@gmartinez.net
+- **Direct Contact**: gio@iqtoolkit.ai
 
 ---
 

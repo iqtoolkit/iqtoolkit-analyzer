@@ -1,18 +1,17 @@
-# 🧠 Iqtoolkit Analyzer
+# 🧠 IQToolkit Analyzer
 
 An intelligent database performance analyzer that uses AI to diagnose slow queries and provide actionable optimization recommendations.
 
-## 🎯 **Current Support: PostgreSQL + MongoDB Ready**
-**✅ Production Ready**: PostgreSQL slow query analysis with comprehensive AI-powered recommendations  
+## 🎯 Current Support
+**✅ Production Ready**: PostgreSQL slow query analysis with AI-powered recommendations  
 **✅ Production Ready**: MongoDB slow query analysis with real-time profiler integration and multi-format reporting  
-**🚧 Traditional SQL**: MySQL and SQL Server support in v0.4.0 (Q3 2026)
+**🚧 Planned**: MySQL and SQL Server support (see Roadmap)
 
-> **🚀 NEW in v0.2.0**: MongoDB support is now fully available! Use `iqtoolkit-analyzer mongodb` to analyze your MongoDB performance with real-time profiler integration, comprehensive indexing recommendations, and multi-format reports.
+> **🚀 v0.2.2**: MongoDB support and configurable AI providers (Ollama + OpenAI) are fully available.
 
 ![Python](https://img.shields.io/badge/python-3.11+-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
-![OpenAI](https://img.shields.io/badge/AI-OpenAI%20Only%20v0.1.x-orange.svg)
-![Ollama](https://img.shields.io/badge/AI-Ollama%20Coming%20v0.2.0-blue.svg)
+![AI Providers](https://img.shields.io/badge/AI-Ollama%20%26%20OpenAI-blue.svg)
 ![PostgreSQL](https://img.shields.io/badge/database-PostgreSQL%20Ready-336791?logo=postgresql&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/database-MongoDB%20Ready-47A248?logo=mongodb&logoColor=white)
 ![MySQL](https://img.shields.io/badge/database-MySQL%20Planned%20v0.4.0-4479A1?logo=mysql&logoColor=white)
@@ -62,7 +61,7 @@ An intelligent database performance analyzer that uses AI to diagnose slow queri
 
 ## 🎯 Overview
 
-Slow Query Doctor automatically analyzes your **PostgreSQL** and **MongoDB** slow query logs and provides intelligent, AI-powered optimization recommendations. It identifies performance bottlenecks, calculates impact scores, and generates detailed reports with specific suggestions for improving database performance.
+IQToolkit Analyzer automatically analyzes your **PostgreSQL** and **MongoDB** slow query logs and provides intelligent, AI-powered optimization recommendations. It identifies performance bottlenecks, calculates impact scores, and generates detailed reports with specific suggestions for improving database performance.
 
 ### 🗄️ **Database & AI Support Status**
 
@@ -75,17 +74,33 @@ Slow Query Doctor automatically analyzes your **PostgreSQL** and **MongoDB** slo
 | **SQL Server** | 🚧 Planned | v0.4.0 | Q3 2026 |
 
 **AI Provider Support:**
-| AI Provider | Status | Version | Timeline |
-|------------|--------|---------|----------|
-| **OpenAI GPT** | ✅ **Current Only** | v0.1.x | Available now |
-| **Ollama (Local)** | 🚧 **Default in Future** | v0.2.0+ | Nov 2025 - Q1 2026 |
-| **Multiple Providers** | 🚧 Configurable | v0.2.0+ | Nov 2025 - Q1 2026 |
+| AI Provider | Status | Version |
+|------------|--------|---------|
+| **Ollama (Local/Remote)** | ✅ Supported | v0.2.2+ |
+| **OpenAI GPT** | ✅ Supported | v0.1.x+ |
 
 > **📢 MongoDB Ready**: MongoDB slow query analysis is now available! Use the `mongodb` command to analyze your MongoDB performance.
 > 
 > **📢 Want to influence MySQL/SQL Server development?** Check out our [future database sample directories](docs/sample_logs/) and share your specific requirements!
 
 > **v0.1.6 Release Note**: This is the **final v0.1.x release with new features**. It includes comprehensive architecture documentation and prepares the codebase for multi-database support coming in v0.4.0. All references have been updated from "PostgreSQL-specific" to "database log analyzer" to reflect our roadmap for MySQL and SQL Server support. Future v0.1.x releases (v0.1.7+) will contain **bug fixes only** - all new features move to v0.2.0+.
+
+
+## 🧩 Monorepo Overview
+
+This repository now hosts a modular structure to support future services while keeping development fast:
+
+```
+iqtoolkit-analyzer/
+├── iqtoolkit_analyzer/      # Current CLI package (to be service-ized)
+├── iqtoolkit-contracts/     # Shared Pydantic models (Poetry package)
+├── iqtoolkit-iqai/          # AI Copilot service (Poetry package)
+├── iqtoolkithub/            # Orchestration gateway (Poetry package)
+├── iqtoolkit-deployment/    # Helm charts and deployment assets
+└── docs/                    # Documentation and samples
+```
+
+See [ROADMAP.md](ROADMAP.md) for the phase-by-phase plan.
 
 
 ### Key Features
@@ -112,38 +127,48 @@ Slow Query Doctor automatically analyzes your **PostgreSQL** and **MongoDB** slo
   - **v0.2.0+**: Local Ollama models by default (enterprise-safe)
 - 🔧 **Extensible**: Future-ready architecture supports multiple databases and AI providers
 
-## 🚀 Quick Start
+## 🚀 Quick Start (Monorepo + Poetry)
 
 > **⚡ Ready to analyze PostgreSQL or MongoDB slow queries right now?** Follow the installation below.  
-> **🔮 Planning for MySQL/SQL Server?** [Join the early feedback program](https://github.com/iqtoolkit/slow-query-doctor/discussions) to shape v0.4.0 development!
+> **🔮 Planning for MySQL/SQL Server?** [Join the early feedback program](https://github.com/iqtoolkit/iqtoolkit-analyzer/discussions) to shape v0.4.0 development!
 
 ### Installation
 
-#### Option A: Using uv (Recommended - Fast & Modern)
+#### Preferred: Poetry
 
-1. **Install uv** (if not already installed):
 ```bash
-# macOS/Linux
-curl -LsSf https://astral.sh/uv/install.sh | sh
-# Or via pip
-pip install uv
+git clone https://github.com/iqtoolkit/iqtoolkit-analyzer.git
+cd iqtoolkit-analyzer
+
+# Install Poetry (pick one)
+## macOS (Homebrew)
+brew update && brew install poetry
+
+## macOS/Linux (Official installer)
+curl -sSL https://install.python-poetry.org | python3 -
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc && source ~/.zshrc
+
+## Windows (PowerShell)
+powershell -ExecutionPolicy Bypass -NoProfile -Command "(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -"
+
+## Cross-platform (pipx)
+pipx install poetry
+
+# Install dependencies for shared/contracts and services
+cd iqtoolkit-contracts && poetry install && cd -
+cd iqtoolkit-iqai && poetry install && cd -
+cd iqtoolkithub && poetry install && cd -
+
+# Analyzer CLI (root package)
+poetry install --with dev,test
 ```
 
-2. **Clone and setup:**
-```bash
-git clone https://github.com/iqtoolkit/slow-query-doctor.git
-cd slow-query-doctor
-
-# Quick setup with uv
-make setup
-```
-
-#### Option B: Traditional Python (Fallback)
+#### Traditional Python (venv + pip)
 
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/iqtoolkit/slow-query-doctor.git
-cd slow-query-doctor
+git clone https://github.com/iqtoolkit/iqtoolkit-analyzer.git
+cd iqtoolkit-analyzer
 ```
 
 2. **Create virtual environment:**
@@ -161,16 +186,21 @@ pip install -e .[dev,test]
 
 #### AI Provider Setup (Both Options)
 
-**Option A: Ollama (Recommended - Local, private, no API key needed) ⭐**
+**Option A: Ollama (Recommended - Local or remote, private, no API key needed) ⭐**
 ```bash
-# Quick setup (see docs/5-minute-ollama-setup.md for details)
+# Local setup (see docs/5-minute-ollama-setup.md for details)
 curl -LsSf https://ollama.com/install.sh | sh
 ollama serve
-ollama pull arctic-text2sql-r1:7b  # SQL-specialized model (recommended)
+ollama pull a-kore/Arctic-Text2SQL-R1-7B  # SQL-specialized model (recommended)
 
 # Copy example config and customize
 cp .iqtoolkit-analyzer.yml.example .iqtoolkit-analyzer.yml
 # Edit: set llm_provider: ollama
+
+# OR use remote Ollama server
+export OLLAMA_HOST=http://your-server-ip:11434
+# Or add to .iqtoolkit-analyzer.yml:
+#   ollama_host: http://your-server-ip:11434
 ```
 
 **Option B: OpenAI (Cloud, requires API key)**
@@ -179,44 +209,44 @@ export OPENAI_API_KEY="your-openai-api-key-here"
 # Config will use OpenAI by default if no .iqtoolkit-analyzer.yml exists
 ```
 
-> **💡 Tip**: Ollama runs completely locally—your queries never leave your machine. Perfect for sensitive production data. See [Ollama Local Setup](docs/ollama-local.md) for details.
+> **💡 Tip**: Ollama can run locally or on a remote server—your queries stay within your infrastructure. Perfect for sensitive production data. See [Ollama Setup Guide](docs/ollama-local.md) for local and remote configuration details.
 
 ### Basic Usage
 
 #### PostgreSQL Analysis
 ```bash
-# With uv (recommended - fast)
-uv run python -m iqtoolkit_analyzer postgresql sample_logs/postgresql-2025-10-28_192816.log.txt --output report.md
+# With Poetry
+poetry run python -m iqtoolkit_analyzer postgresql sample_logs/postgresql-2025-10-28_192816.log.txt --output report.md
 
-# Or traditional approach
+# Or traditional venv/pip
 python -m iqtoolkit_analyzer postgresql sample_logs/postgresql-2025-10-28_192816.log.txt --output report.md
 ```
 
 #### MongoDB Analysis
 ```bash
-# Connect to MongoDB and analyze slow queries
-uv run python -m iqtoolkit_analyzer mongodb --connection-string "mongodb://localhost:27017" --output ./reports
+# With Poetry
+poetry run python -m iqtoolkit_analyzer mongodb --connection-string "mongodb://localhost:27017" --output ./reports
 
-# With configuration file
-uv run python -m iqtoolkit_analyzer mongodb --config .mongodb-config.yml --output ./reports
+# With configuration file (Poetry)
+poetry run python -m iqtoolkit_analyzer mongodb --config .mongodb-config.yml --output ./reports
 
-# Traditional approach
+# Or traditional venv/pip
 python -m iqtoolkit_analyzer mongodb --connection-string "mongodb://localhost:27017" --output ./reports
 ```
 
 #### Advanced Usage Examples
 ```bash
-# PostgreSQL: Analyze top 5 slowest queries (uv)
-uv run python -m iqtoolkit_analyzer postgresql sample_logs/postgresql-2025-10-28_192816.log.txt --output report.md --top-n 5
+# PostgreSQL: Analyze top 5 slowest queries (Poetry)
+poetry run python -m iqtoolkit_analyzer postgresql docs/sample_logs/postgresql/postgresql-2025-10-28_192816.log.txt --output report.md --top-n 5
 
 # MongoDB: Generate multiple report formats
-uv run python -m iqtoolkit_analyzer mongodb --connection-string "mongodb://localhost:27017" --output ./reports --format json html markdown
+poetry run python -m iqtoolkit_analyzer mongodb --connection-string "mongodb://localhost:27017" --output ./reports --format json html markdown
 
-# PostgreSQL: Get more detailed AI analysis (uv)
-uv run python -m iqtoolkit_analyzer postgresql sample_logs/postgresql-2025-10-28_192816.log.txt --output report.md --max-tokens 200
+# PostgreSQL: Get more detailed AI analysis
+poetry run python -m iqtoolkit_analyzer postgresql docs/sample_logs/postgresql/postgresql-2025-10-28_192816.log.txt --output report.md --max-tokens 200
 
 # MongoDB: Enable verbose debug output
-uv run python -m iqtoolkit_analyzer mongodb --connection-string "mongodb://localhost:27017" --output ./reports --verbose
+poetry run python -m iqtoolkit_analyzer mongodb --connection-string "mongodb://localhost:27017" --output ./reports --verbose
 
 # Traditional approach for any of the above
 python -m iqtoolkit_analyzer postgresql sample_logs/postgresql-2025-10-28_192816.log.txt --output report.md --top-n 5
@@ -224,18 +254,18 @@ python -m iqtoolkit_analyzer postgresql sample_logs/postgresql-2025-10-28_192816
 
 #### With Your Own Logs
 ```bash
-# Basic analysis (uv)
-uv run python -m iqtoolkit_analyzer /path/to/your/postgresql.log --output analysis_report.md
+# Basic analysis (Poetry)
+poetry run python -m iqtoolkit_analyzer /path/to/your/postgresql.log --output analysis_report.md
 
-# Advanced options (uv)
-uv run python -m iqtoolkit_analyzer /path/to/your/postgresql.log \
+# Advanced options (Poetry)
+poetry run python -m iqtoolkit_analyzer /path/to/your/postgresql.log \
   --output detailed_report.md \
   --top-n 10 \
   --min-duration 1000 \
   --max-tokens 150 \
   --verbose
 
-# Traditional approach
+# Traditional venv/pip
 python -m iqtoolkit_analyzer /path/to/your/postgresql.log --output analysis_report.md
 ```
 
@@ -252,8 +282,8 @@ The `docs/sample_logs/` directory contains database slow query log examples for 
 - **SQL Server**: Placeholder directory with Extended Events samples and configuration → [View samples](docs/sample_logs/sqlserver/)
 
 > 🎯 **Early Feedback Opportunities**: 
-> - **MySQL Users**: [Share your slow query log formats and challenges](https://github.com/iqtoolkit/slow-query-doctor/issues/new?labels=mysql-feedback&title=MySQL%20Requirements)
-> - **SQL Server DBAs**: [Tell us about your Extended Events setup and pain points](https://github.com/iqtoolkit/slow-query-doctor/issues/new?labels=sqlserver-feedback&title=SQL%20Server%20Requirements)
+> - **MySQL Users**: [Share your slow query log formats and challenges](https://github.com/iqtoolkit/iqtoolkit-analyzer/issues/new?labels=mysql-feedback&title=MySQL%20Requirements)
+> - **SQL Server DBAs**: [Tell us about your Extended Events setup and pain points](https://github.com/iqtoolkit/iqtoolkit-analyzer/issues/new?labels=sqlserver-feedback&title=SQL%20Server%20Requirements)
 
 ### Available Sample Files
 
@@ -292,20 +322,16 @@ Sample log files use the `.txt` extension instead of `.log` to prevent them from
    - Complex mathematical calculations (`SQRT`, `SIN`, `COS`, `LOG`)
    - Heavy sorting and partitioning operations
 
-## 🏗️ Project Architecture
+## 🏗️ Project Architecture (Monorepo)
 
 ```
-slow-query-doctor/
-├── iqtoolkit_analyzer/       # Main package
-│   ├── __init__.py          # Package interface
-│   ├── parser.py            # Log file parsing
-│   ├── analyzer.py          # Query analysis & scoring
-│   ├── llm_client.py        # AI/OpenAI integration
-│   └── report_generator.py  # Markdown report generation
-├── sample_logs/             # Sample PostgreSQL log files
-│   └── postgresql-2025-10-28_192816.log.txt  # Real slow query examples
-├── requirements.txt         # Python dependencies
-└── README.md               # This file
+iqtoolkit-analyzer/
+├── iqtoolkit_analyzer/      # Current CLI package (to be service-ized)
+├── iqtoolkit-contracts/     # Shared Pydantic models (Poetry package)
+├── iqtoolkit-iqai/          # AI Copilot service (Poetry package)
+├── iqtoolkithub/            # Orchestration gateway (Poetry package)
+├── iqtoolkit-deployment/    # Helm charts and deployment assets
+└── docs/                    # Documentation and samples
 ```
 
 ### Data Flow
@@ -315,7 +341,7 @@ slow-query-doctor/
 3. **AI Analysis** → Generate optimization recommendations using AI models
 4. **Report** → Create comprehensive Markdown analysis report
 
-> **Multi-Database Roadmap**: MySQL and SQL Server support planned for v0.4.0 (Q3 2026)
+> See [ROADMAP.md](ROADMAP.md) for milestones (v0.2.2 current, v0.2.3 next) and central-plan phases.
 
 
 ## ⚙️ Configuration
@@ -495,8 +521,8 @@ Replace the correlated subquery with a JOIN or window function. Create indexes o
 
 ### PostgreSQL Analysis
 ```bash
-# With uv (recommended)
-uv run python -m iqtoolkit_analyzer postgresql [LOG_FILE] [OPTIONS]
+# With Poetry (recommended)
+poetry run python -m iqtoolkit_analyzer postgresql [LOG_FILE] [OPTIONS]
 
 # Traditional approach
 python -m iqtoolkit_analyzer postgresql [LOG_FILE] [OPTIONS]
@@ -515,8 +541,8 @@ python -m iqtoolkit_analyzer postgresql [LOG_FILE] [OPTIONS]
 
 ### MongoDB Analysis
 ```bash
-# With uv (recommended)
-uv run python -m iqtoolkit_analyzer mongodb [OPTIONS]
+# With Poetry (recommended)
+poetry run python -m iqtoolkit_analyzer mongodb [OPTIONS]
 
 # Traditional approach
 python -m iqtoolkit_analyzer mongodb [OPTIONS]
@@ -605,14 +631,12 @@ cp /var/log/postgresql/postgresql.log ~/my_log.log
 
 ### Quick Development Setup
 ```bash
-# Clone and setup with uv (recommended)
-git clone https://github.com/iqtoolkit/slow-query-doctor.git
-cd slow-query-doctor
+# Clone and setup (prefers Poetry, falls back to venv/pip)
+git clone https://github.com/iqtoolkit/iqtoolkit-analyzer.git
+cd iqtoolkit-analyzer
 make setup
 
-# Or traditional approach
-git clone https://github.com/iqtoolkit/slow-query-doctor.git
-cd slow-query-doctor
+# Or traditional approach (manual)
 python -m venv .venv
 source .venv/bin/activate
 pip install -e .[dev,test]
@@ -620,7 +644,6 @@ pip install -e .[dev,test]
 
 ### Running Tests
 ```bash
-# With uv (recommended)
 make test          # Run all tests
 make lint          # Run linting
 make format        # Format code
@@ -647,7 +670,7 @@ htmlcov is the folder where the HTML coverage report is generated when you run t
 
 ### Code Quality
 ```bash
-# With uv and Makefile (recommended)
+# With Makefile (recommended)
 make format        # Format with black
 make lint          # Lint with flake8 + mypy
 make validate      # Full validation suite
@@ -675,8 +698,8 @@ How it’s configured here:
 - Third‑party modules with incomplete type hints (like openai, dotenv) are allowed via ignore_missing_imports overrides.
 
 How to run it:
-- Recommended: make lint (runs flake8 then mypy via uv)
-- Directly: uv run mypy iqtoolkit_analyzer
+- Recommended: make lint (runs flake8 then mypy)
+- Directly: .venv/bin/mypy iqtoolkit_analyzer
 
 Common fixes:
 - Add or refine type hints: parameters, return types, and local variables when useful
@@ -691,10 +714,10 @@ Type stubs:
 ### Testing with Sample Data
 ```bash
 # Test the parser
-uv run python -c "from iqtoolkit_analyzer import parse_postgres_log; print(len(parse_postgres_log('sample_logs/postgresql-2025-10-28_192816.log.txt')))"
+python -c "from iqtoolkit_analyzer import parse_postgres_log; print(len(parse_postgres_log('sample_logs/postgresql-2025-10-28_192816.log.txt')))"
 
 # Test full pipeline with sample data
-uv run python -m iqtoolkit_analyzer sample_logs/postgresql-2025-10-28_192816.log.txt --output test_report.md
+python -m iqtoolkit_analyzer sample_logs/postgresql-2025-10-28_192816.log.txt --output test_report.md
 
 # Verify AI recommendations are generated
 grep -A 5 "🤖 AI Recommendation" test_report.md

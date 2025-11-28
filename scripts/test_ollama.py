@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
-Test script to verify Ollama is working with Slow Query Doctor.
+Test script to verify Ollama is working with IQToolkit Analyzer.
 
 Usage:
+    # Preferred (Poetry)
+    poetry run python scripts/test_ollama.py
+
+    # Or plain Python
     python scripts/test_ollama.py
-    # or with uv:
-    uv run python scripts/test_ollama.py
 """
 
 import sys
@@ -47,14 +49,14 @@ def test_ollama_connection():
     except Exception as e:
         logger.error(f"❌ Ollama connection failed: {e}")
         logger.error("Make sure Ollama is running: ollama serve")
-        logger.error("And model is pulled: ollama pull arctic-text2sql-r1:7b")
+        logger.error("And model is pulled: ollama pull a-kore/Arctic-Text2SQL-R1-7B")
         return False
 
     return True
 
 
 def test_slow_query_doctor_ollama():
-    """Test Slow Query Doctor's Ollama integration."""
+    """Test IQToolkit Analyzer's Ollama integration."""
     try:
         logger.info("Testing Slow Query Doctor Ollama integration...")
 
@@ -88,20 +90,22 @@ def test_slow_query_doctor_ollama():
 
 def main():
     """Run all Ollama tests."""
-    logger.info("🔍 Testing Ollama setup for Slow Query Doctor...")
+    logger.info("🔍 Testing Ollama setup for IQToolkit Analyzer...")
 
     # Test 1: Direct Ollama connection
     if not test_ollama_connection():
         logger.error("❌ Basic Ollama test failed. Check your setup.")
         return 1
 
-    # Test 2: Slow Query Doctor integration
+    # Test 2: IQToolkit Analyzer integration
     if not test_slow_query_doctor_ollama():
-        logger.error("❌ Slow Query Doctor integration test failed.")
+        logger.error("❌ IQToolkit Analyzer integration test failed.")
         return 1
 
-    logger.info("🎉 All tests passed! Ollama is ready for Slow Query Doctor.")
-    logger.info("You can now run: python -m iqtoolkit_analyzer your_log_file.log")
+    logger.info("🎉 All tests passed! Ollama is ready for IQToolkit Analyzer.")
+    logger.info(
+        "You can now run: poetry run python -m iqtoolkit_analyzer your_log_file.log"
+    )
     logger.info("Make sure your .iqtoolkit-analyzer.yml has: llm_provider: ollama")
 
     return 0
