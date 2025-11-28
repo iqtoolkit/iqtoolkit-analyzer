@@ -1,100 +1,81 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=1.9.0"]
+build-backend = "poetry.core.masonry.api"
 
-[project]
+[tool.poetry]
 name = "iqtoolkit-analyzer"
 version = "0.2.2"
 description = "AI-powered multi-database performance analyzer for PostgreSQL and MongoDB with privacy-first intelligence"
 readme = "README.md"
-license = {text = "MIT"}
-authors = [
-    {name = "Giovanni Martinez", email = "gio@iqtoolkit.ai"},
-]
-maintainers = [
-    {name = "Giovanni Martinez", email = "gio@iqtoolkit.ai"},
-]
+license = "MIT"
+authors = ["Giovanni Martinez <gio@iqtoolkit.ai>"]
+maintainers = ["Giovanni Martinez <gio@iqtoolkit.ai>"]
+homepage = "https://github.com/iqtoolkit/iqtoolkit-analyzer"
+repository = "https://github.com/iqtoolkit/iqtoolkit-analyzer"
 keywords = [
-    "postgresql",
-    "mongodb",
-    "database",
-    "performance",
-    "optimization",
-    "sql",
-    "ai",
-    "openai",
-    "slow-queries",
-    "analyzer",
+  "postgresql",
+  "mongodb",
+  "database",
+  "performance",
+  "optimization",
+  "sql",
+  "ai",
+  "openai",
+  "slow-queries",
+  "analyzer",
 ]
 classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "Intended Audience :: System Administrators",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: SQL",
-    "Topic :: Database",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: System :: Systems Administration",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
-]
-requires-python = ">=3.11"
-dependencies = [
-    "ollama",
-    "pandas>=2.0.0",
-    "openai>=1.0.0",
-    "python-dotenv>=0.19.0",
-    "pyyaml>=6.0.0",
-    "ruamel.yaml>=0.17.21",
-    "tqdm>=4.0.0",
-    "psycopg>=3.1.18"
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Intended Audience :: System Administrators",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: SQL",
+  "Topic :: Database",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: System :: Systems Administration",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.0.0",
-    "pytest-cov>=4.0.0",
-    "black>=23.0.0",
-    "flake8>=6.0.0",
-    "mypy>=1.0.0",
-    "isort>=5.12.0",
-    "pre-commit>=3.0.0",
-    "ruamel.yaml>=0.17.0",
-    "pip-tools>=7.0.0",
-]
+[tool.poetry.dependencies]
+python = ">=3.11,<4.0"
+ollama = "*"
+pandas = ">=2.0.0"
+openai = ">=1.0.0"
+python-dotenv = ">=0.19.0"
+pyyaml = ">=6.0.0"
+ruamel.yaml = ">=0.17.21"
+tqdm = ">=4.0.0"
+psycopg = ">=3.1.18"
 
-test = [
-    "pytest>=7.0.0",
-    "pytest-cov>=4.0.0",
-    "pytest-mock>=3.10.0",
-    "black>=23.0.0",
-]
-docs = [
-    "mkdocs>=1.4.0",
-    "mkdocs-material>=9.0.0",
-    "mkdocs-mermaid2-plugin>=1.0.0",
-]
+[tool.poetry.group.dev.dependencies]
+pytest = ">=7.0.0"
+pytest-cov = ">=4.0.0"
+black = ">=23.0.0"
+flake8 = ">=6.0.0"
+mypy = ">=1.0.0"
+isort = ">=5.12.0"
+pre-commit = ">=3.0.0"
+ruamel.yaml = ">=0.17.0"
+pip-tools = ">=7.0.0"
 
-[project.urls]
-Homepage = "https://github.com/iqtoolkit/iqtoolkit-analyzer"
-Repository = "https://github.com/iqtoolkit/iqtoolkit-analyzer"
-Issues = "https://github.com/iqtoolkit/iqtoolkit-analyzer/issues"
-Changelog = "https://github.com/iqtoolkit/iqtoolkit-analyzer/releases"
+[tool.poetry.group.test.dependencies]
+pytest = ">=7.0.0"
+pytest-cov = ">=4.0.0"
+pytest-mock = ">=3.10.0"
+black = ">=23.0.0"
 
-[project.scripts]
+[tool.poetry.group.docs.dependencies]
+mkdocs = ">=1.4.0"
+"mkdocs-material" = ">=9.0.0"
+"mkdocs-mermaid2-plugin" = ">=1.0.0"
+
+[tool.poetry.scripts]
 iqtoolkit-analyzer = "iqtoolkit_analyzer.__main__:main"
-slow-query-doctor = "iqtoolkit_analyzer.__main__:main"  # Legacy compatibility
-
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["iqtoolkit_analyzer*"]
-exclude = ["tests*", "docs*", "sample_logs*"]
-
-[tool.setuptools.package-data]
-iqtoolkit_analyzer = ["py.typed"]
+slow-query-doctor = "iqtoolkit_analyzer.__main__:main"
 
 # Black configuration
 [tool.black]

@@ -152,26 +152,7 @@ cd iqtoolkithub && poetry install && cd -
 poetry install
 ```
 
-#### Option A: Using uv (legacy)
-
-1. **Install uv** (if not already installed):
-```bash
-# macOS/Linux
-curl -LsSf https://astral.sh/uv/install.sh | sh
-# Or via pip
-pip install uv
-```
-
-2. **Clone and setup:**
-```bash
-git clone https://github.com/iqtoolkit/iqtoolkit-analyzer.git
-cd iqtoolkit-analyzer
-
-# Quick setup with uv
-make setup
-```
-
-#### Option B: Traditional Python (Fallback)
+#### Traditional Python (venv + pip)
 
 1. **Clone the repository:**
 ```bash
@@ -223,22 +204,22 @@ export OPENAI_API_KEY="your-openai-api-key-here"
 
 #### PostgreSQL Analysis
 ```bash
-# With uv (recommended - fast)
-uv run python -m iqtoolkit_analyzer postgresql sample_logs/postgresql-2025-10-28_192816.log.txt --output report.md
+# With Poetry
+poetry run python -m iqtoolkit_analyzer postgresql sample_logs/postgresql-2025-10-28_192816.log.txt --output report.md
 
-# Or traditional approach
+# Or traditional venv/pip
 python -m iqtoolkit_analyzer postgresql sample_logs/postgresql-2025-10-28_192816.log.txt --output report.md
 ```
 
 #### MongoDB Analysis
 ```bash
-# Connect to MongoDB and analyze slow queries
-uv run python -m iqtoolkit_analyzer mongodb --connection-string "mongodb://localhost:27017" --output ./reports
+# With Poetry
+poetry run python -m iqtoolkit_analyzer mongodb --connection-string "mongodb://localhost:27017" --output ./reports
 
-# With configuration file
-uv run python -m iqtoolkit_analyzer mongodb --config .mongodb-config.yml --output ./reports
+# With configuration file (Poetry)
+poetry run python -m iqtoolkit_analyzer mongodb --config .mongodb-config.yml --output ./reports
 
-# Traditional approach
+# Or traditional venv/pip
 python -m iqtoolkit_analyzer mongodb --connection-string "mongodb://localhost:27017" --output ./reports
 ```
 
@@ -250,7 +231,7 @@ poetry run python -m iqtoolkit_analyzer postgresql docs/sample_logs/postgresql/p
 # MongoDB: Generate multiple report formats
 poetry run python -m iqtoolkit_analyzer mongodb --connection-string "mongodb://localhost:27017" --output ./reports --format json html markdown
 
-# PostgreSQL: Get more detailed AI analysis (uv)
+# PostgreSQL: Get more detailed AI analysis
 poetry run python -m iqtoolkit_analyzer postgresql docs/sample_logs/postgresql/postgresql-2025-10-28_192816.log.txt --output report.md --max-tokens 200
 
 # MongoDB: Enable verbose debug output
@@ -265,7 +246,7 @@ python -m iqtoolkit_analyzer postgresql sample_logs/postgresql-2025-10-28_192816
 # Basic analysis (Poetry)
 poetry run python -m iqtoolkit_analyzer /path/to/your/postgresql.log --output analysis_report.md
 
-# Advanced options (uv)
+# Advanced options (Poetry)
 poetry run python -m iqtoolkit_analyzer /path/to/your/postgresql.log \
   --output detailed_report.md \
   --top-n 10 \
@@ -273,7 +254,7 @@ poetry run python -m iqtoolkit_analyzer /path/to/your/postgresql.log \
   --max-tokens 150 \
   --verbose
 
-# Traditional approach
+# Traditional venv/pip
 python -m iqtoolkit_analyzer /path/to/your/postgresql.log --output analysis_report.md
 ```
 
@@ -639,14 +620,12 @@ cp /var/log/postgresql/postgresql.log ~/my_log.log
 
 ### Quick Development Setup
 ```bash
-# Clone and setup with uv (recommended)
-git clone https://github.com/iqtoolkit/slow-query-doctor.git
-cd slow-query-doctor
+# Clone and setup
+git clone https://github.com/iqtoolkit/iqtoolkit-analyzer.git
+cd iqtoolkit-analyzer
 make setup
 
-# Or traditional approach
-git clone https://github.com/iqtoolkit/slow-query-doctor.git
-cd slow-query-doctor
+# Or traditional approach (manual)
 python -m venv .venv
 source .venv/bin/activate
 pip install -e .[dev,test]
@@ -654,7 +633,6 @@ pip install -e .[dev,test]
 
 ### Running Tests
 ```bash
-# With uv (recommended)
 make test          # Run all tests
 make lint          # Run linting
 make format        # Format code
@@ -681,7 +659,7 @@ htmlcov is the folder where the HTML coverage report is generated when you run t
 
 ### Code Quality
 ```bash
-# With uv and Makefile (recommended)
+# With Makefile (recommended)
 make format        # Format with black
 make lint          # Lint with flake8 + mypy
 make validate      # Full validation suite
@@ -709,8 +687,8 @@ How it’s configured here:
 - Third‑party modules with incomplete type hints (like openai, dotenv) are allowed via ignore_missing_imports overrides.
 
 How to run it:
-- Recommended: make lint (runs flake8 then mypy via uv)
-- Directly: uv run mypy iqtoolkit_analyzer
+- Recommended: make lint (runs flake8 then mypy)
+- Directly: .venv/bin/mypy iqtoolkit_analyzer
 
 Common fixes:
 - Add or refine type hints: parameters, return types, and local variables when useful
@@ -725,10 +703,10 @@ Type stubs:
 ### Testing with Sample Data
 ```bash
 # Test the parser
-uv run python -c "from iqtoolkit_analyzer import parse_postgres_log; print(len(parse_postgres_log('sample_logs/postgresql-2025-10-28_192816.log.txt')))"
+python -c "from iqtoolkit_analyzer import parse_postgres_log; print(len(parse_postgres_log('sample_logs/postgresql-2025-10-28_192816.log.txt')))"
 
 # Test full pipeline with sample data
-uv run python -m iqtoolkit_analyzer sample_logs/postgresql-2025-10-28_192816.log.txt --output test_report.md
+python -m iqtoolkit_analyzer sample_logs/postgresql-2025-10-28_192816.log.txt --output test_report.md
 
 # Verify AI recommendations are generated
 grep -A 5 "🤖 AI Recommendation" test_report.md

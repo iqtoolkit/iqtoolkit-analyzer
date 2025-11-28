@@ -7,6 +7,7 @@ Current State (v0.2.2 — Stable)
 - Reports: Markdown, JSON, and HTML (MongoDB dashboards)
 - Privacy-first defaults with local Ollama support
 - CLI ready; docs refreshed and aligned to current features
+- Tooling update: Removed legacy 'uv' references; standardized on Poetry and venv/pip
 
 Architecture Shift: Modular Monorepo
 - We moved from a single-package repo to a modular monorepo to enable faster iteration and clearer boundaries.
@@ -17,6 +18,7 @@ Architecture Shift: Modular Monorepo
   - iqtoolkithub: Orchestration gateway that composes Analyzer + IQAI (Poetry package)
   - iqtoolkit-deployment: Helm/K8s deployment assets
 - Tooling: Poetry across packages, path dependencies for fast local development
+- Root package migrated to Poetry for consistent dependency management
 - Why this change: Atomic changes across modules, simpler contracts, and a clean transition to services later without fragmentation into multiple repos.
 
 What’s Next (Roadmap Highlights)
