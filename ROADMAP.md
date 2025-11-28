@@ -36,123 +36,119 @@
 
 ---
 
-## v0.2.2a1 - MongoDB Support (Nov 2025) ✅ ALPHA READY
+## v0.2.2 - MongoDB Support + AI Provider Flexibility (Nov 2025) ✅ STABLE
 
-**Focus:** MongoDB slow query analysis and reporting
+**Focus:** MongoDB slow query analysis and configurable AI providers
 
-**🚨 MONGODB FEATURES COMPLETE**
+**🎉 SHIPPED FEATURES**
 - ✅ **MongoDB slow query analyzer** with profiler integration
 - ✅ **MongoDB query pattern recognition** and normalization
 - ✅ **Enhanced configuration system** (expanded YAML configuration with MongoDB support)
 - ✅ **HTML report generation** (interactive dashboards with MongoDB-specific insights)
 - ✅ **Multi-format reporting** (JSON, Markdown, HTML)
 - ✅ **CLI integration** with database-specific subcommands
-- ✅ **Production integration test** script for validation
+- ✅ **Configurable AI providers** (Ollama + OpenAI) - **SHIPPED EARLY** 🚀
+- ✅ **Privacy-first AI** with local Ollama support (enterprise-ready)
+- ✅ **Flexible model configuration** (custom hosts, multiple models)
 
-**Features:**
+**Complete Feature List:**
 - [x] **MongoDB slow query analyzer** (complete with profiler integration)
 - [x] **Enhanced configuration system** (expanded .iqtoolkit-analyzer.yml options)
 - [x] **HTML report generation** (interactive dashboards)
-- [x] **Multi-file analysis** (batch processing)
-- [ ] **MongoDB aggregation pipeline optimization** → v0.2.3
-- [ ] **MongoDB indexing recommendations** → v0.2.3
+# 🚦 IQToolkit Analyzer Roadmap
+
+This roadmap reflects the current state at v0.2.2 and aligns with the multi-phase central plan (Phase 0–5) for evolving the platform to a modular, service-oriented architecture inside a single monorepo.
 
 ---
 
-## v0.2.3 - Enhanced MongoDB Analysis (Q1 2026) 📋 PLANNED
+## Current Release: v0.2.2 ✅ STABLE
 
-**Focus:** Advanced MongoDB optimization features
+MongoDB support and configurable AI providers are fully shipped.
 
-- [ ] **MongoDB aggregation pipeline optimization** recommendations
-- [ ] **MongoDB indexing strategy** analysis and suggestions
-- [ ] **Query complexity scoring and classification**
-- [ ] **Enhanced anti-pattern detection engine**
+**Highlights**
+- ✅ MongoDB slow query analyzer with profiler integration
+- ✅ MongoDB query pattern recognition and normalization
+- ✅ Enhanced configuration system (expanded YAML + MongoDB options)
+- ✅ Multi-format reporting (JSON, Markdown, HTML)
+- ✅ CLI integration with database-specific subcommands
+- ✅ Configurable AI providers (Ollama + OpenAI)
+- ✅ Privacy-first AI with local Ollama support
+- ✅ Flexible model configuration (custom hosts, multiple models)
+- [ ] **Execution metrics extraction** (performance, I/O, estimation accuracy)
+- [ ] **Anti-pattern detection** (seq scans, inefficient joins, poor filters)
+- [ ] **Index recommendations** from EXPLAIN analysis
+## v0.2.3 - PostgreSQL EXPLAIN + MongoDB Enhancements (Q1 2026) 🎯 NEXT
 
+Focus: Advanced query plan analysis (PostgreSQL EXPLAIN per RFC-002) and MongoDB improvements.
+
+**PostgreSQL EXPLAIN Analyzer (RFC-002):**
+- [ ] EXPLAIN plan parser (JSON/YAML)
+- [ ] Execution metrics extraction (performance, I/O, estimation accuracy)
+- [ ] Anti-pattern detection (seq scans, inefficient joins, poor filters)
+- [ ] Index recommendations from EXPLAIN analysis
+- [ ] Unified reporting (integrate EXPLAIN insights)
+- [ ] LLM-powered insights for complex plans
+- [ ] PostgreSQL 9.6–16 support with version-specific handling
+
+**MongoDB Enhancements:**
+- [ ] Aggregation pipeline optimization recommendations
+- [ ] Indexing strategy analysis and suggestions
+- [ ] Query complexity scoring and classification
+- [ ] Enhanced anti-pattern detection (MongoDB-specific)
+
+**Developer Experience:**
+- [ ] Optional FastAPI backend for programmatic access
+- [ ] Improved error messages and troubleshooting
+- [ ] Performance benchmarks and docs
+
+**Focus:** Expand to traditional SQL databases (moved up from v0.4.0)
+
+## v0.3.0 - Platform Modularity & Orchestration (Q2 2026) 📋 PLANNED
+
+Focus: Solidify the modular architecture and introduce orchestration.
+
+**Service Modules (Monorepo):**
+- [ ] Analyzer service (deterministic engine; optional API)
+- [ ] IQAI service (LLM explanations; pydantic-ai)
+- [ ] Hub gateway (orchestration; calls Analyzer + IQAI)
+- [ ] Shared contracts (Pydantic models; path deps)
+
+**Deployment:**
+- [ ] Helm charts (component + umbrella)
+- [ ] CI/CD pipelines (dev → staging → prod)
 ---
 
-## v0.2.4 - Flexible AI Providers (Q1 2026) 📋 PLANNED
+## Central Plan Alignment (Monorepo Phases)
 
-**Focus:** Enterprise-grade AI provider flexibility
+The following summarizes the central-plan execution inside this monorepo:
 
-**🚨 AI PROVIDER FLEXIBILITY**
-- Database logs = sensitive business data
-- **Default: Ollama** (local, private, enterprise-safe)
-- **Optional: OpenAI** (configurable for non-sensitive environments)
-- **Future-ready**: Pluggable architecture for multiple AI providers
+- ✅ Phase 0: Foundations & Separation
+	- 0.1: Scaffolding created — `iqtoolkit-contracts/`, `iqtoolkit-iqai/`, `iqtoolkithub/`, `iqtoolkit-deployment/`
+	- 0.2: Shared contracts package (pending models)
+	- 0.3: Current repo cleanup (pending: isolate analyzer code)
+- 🛠️ Phase 1: Analyzer Service Refactor (planned)
+- 🛠️ Phase 2: IQAI Copilot Service (planned)
+- 🛠️ Phase 3: Hub Orchestration (planned)
+- 🛠️ Phase 4: Deployment & Environments (planned)
+- 🛠️ Phase 5: Production Readiness (planned)
+- [ ] **Track query performance over time** (SQLite/PostgreSQL storage)
+- [ ] **Trend analysis** (queries getting slower/faster over time)
+- [ ] **Automatic baseline detection** (establish normal performance)
+## Database Expansion (Beyond v0.3.x)
 
-- [ ] **Configurable AI providers** (Ollama default, OpenAI optional)
-- [ ] **Flexible model configuration** (custom endpoints, multiple models)
-- [ ] Add EXPLAIN plan analysis integration (PostgreSQL)
-- [ ] FastAPI backend for programmatic access
+As Analyzer modularizes, we will expand to MySQL and SQL Server:
 
----
+**MySQL**
+- [ ] Slow query log parser (standard + JSON)
+- [ ] MySQL-specific anti-patterns
+- [ ] InnoDB-focused optimizations
+- [ ] EXPLAIN FORMAT=JSON analysis
 
-## v0.3.0 - Self-Learning & ML Intelligence (Q2 2026) 🚫 DO NOT START
-
-**Focus:** ML-based intelligence and historical tracking
-
-- [ ] Track query performance over time (historical database)
-- [ ] ML-based anomaly detection for new slow queries
-- [ ] Identify performance regression patterns
-- [ ] Confidence scoring for recommendations
-- [ ] Trend analysis (queries getting slower over time)
-- [ ] Automatic baseline detection
-- [ ] Predictive alerts for queries likely to become slow
-- [ ] Learn from user feedback (which recommendations worked)
-
----
-
-## v0.4.0 - MySQL & SQL Server Support (Q3 2026)
-
-**Focus:** Traditional SQL databases (after MongoDB is stable)
-
-- [ ] **MySQL slow query log support**
-- [ ] **SQL Server Extended Events support**
-- [ ] Database-agnostic query analysis engine
-- [ ] Cross-database performance comparison (PostgreSQL + MongoDB + MySQL + SQL Server)
-- [ ] Unified configuration for multiple database types
-- [ ] Database-specific optimization recommendations
-
-**Early Feedback Collection:**
-- 📁 `docs/sample_logs/mysql/` - Configuration examples and feedback templates
-- 📁 `docs/sample_logs/sqlserver/` - Extended Events samples and feedback collection
-- 🎯 **Goal**: Collect real-world requirements before development starts
-
-**Note:** Oracle support not planned - focusing on PostgreSQL, MongoDB, MySQL, and SQL Server as the most common enterprise databases.
-
----
-
-## v1.0.0 - Production Ready (Q4 2026)
-
-**Focus:** Enterprise-grade stability and features
-
-- [ ] Web UI for easier analysis
-- [ ] API for programmatic access
-- [ ] Authentication and multi-user support
-- [ ] Scheduled analysis and alerting
-- [ ] Integration with monitoring tools (Prometheus, Grafana)
-- [ ] Performance regression CI/CD integration
-- [ ] Comprehensive test coverage
-- [ ] Enterprise support options
-
----
-
-## Future Ideas (Backlog)
-
-- Real-time query monitoring integration
-- Automated optimization application (with approval workflow)
-- Query workload simulator
-- Cost estimation for cloud databases
-- Integration with query plan visualizers
-- Mobile app for on-call DBAs
-- Slack/Teams notification integration
-- AI-powered query rewriting suggestions
-
----
-
-## Community Requests
-
-Track feature requests from users here:
+**SQL Server**
+- [ ] Extended Events parser
+- [ ] Query Store integration (if available)
+- [ ] Execution plan analysis (XML)
+- [ ] SQL Server-specific recommendations
 
 - **Ravi Bhatia:** ML/self-learning system for recommendations → BACKLOG (v0.3.0, Q2 2026)
 - **Uri Dimant:** Query rewrites (not just indexes) → IMPLEMENTED ✅
@@ -161,32 +157,34 @@ Track feature requests from users here:
 
 | Version | Timeline | Status | Key Features |
 |---------|----------|--------|--------------|
-| v0.1.5 | ✅ SHIPPED | Mature | PostgreSQL analyzer with **OpenAI only** |
-| v0.1.6 | Nov 2025 | 🔒 Feature Freeze | **Final v0.1.x with new features** - Documentation, architecture, **OpenAI only** |
-| v0.1.7+ | Ongoing | 🐛 Bug Fixes Only | Critical fixes, **OpenAI only**, no new features |
-| v0.2.2a1 | Nov 2025 | ✅ Alpha Ready | **MongoDB support** - analyzer, profiler integration, multi-format reports, CLI, **OpenAI only** |
-| v0.2.3 | Q1 2026 | � Planned | **Enhanced MongoDB** - aggregation optimization, indexing recommendations |
-| v0.2.4 | Q1 2026 | 📋 Planned | **Configurable AI providers** (Ollama default, OpenAI optional), EXPLAIN plans, FastAPI |
-| v0.3.0 | Q2 2026 | 🚫 Do Not Start | ML/self-learning, anomaly detection |
-| v0.4.0 | Q3 2026 | 📋 Planned | **MySQL, SQL Server support** |
+| v0.1.5 | ✅ Shipped | Historical | PostgreSQL analyzer with OpenAI only |
+| v0.1.6 | ✅ Shipped | Historical | Final v0.1.x feature release, documentation |
+| v0.2.2 | ✅ **Stable** | **Current** | **MongoDB + Ollama/OpenAI providers** |
+| v0.2.3 | Q1 2026 | 🎯 Next | **PostgreSQL EXPLAIN analyzer + MongoDB enhancements** |
+| ~~v0.2.4~~ | ~~Q1 2026~~ | ❌ Cancelled | Features merged into v0.2.2/0.2.3 |
+| v0.3.0 | Q2 2026 | 📋 Planned | **Modular services + orchestration** |
+| v0.4.0 | Q3 2026 | 📋 Planned | **ML/self-learning, anomaly detection** |
 | v1.0.0 | Q4 2026 | 📋 Planned | Web UI, enterprise features |
+
+**🎉 Ahead of Schedule:** v0.2.4's AI provider flexibility shipped **3 months early** in v0.2.2!
 
 ---
 
 ## Release & Versioning (short)
 
-See the published release process and versioning guide in the documentation: `docs/release-process.md`.
+See `docs/release-process.md`.
+
 Key points:
 - `VERSION` at repo root is the single source of truth.
-- Use the provided GitHub Action `/.github/workflows/propagate-version.yml` to propagate and tag releases.
-- Automate changelog generation (Release Drafter or conventional-changelog) and add security scans to CI for release gating.
+- Use the `scripts/propagate_version.py` utility (with `--dry-run` first) to sync versions and create tags.
+- For packaging, use Poetry: `poetry build && poetry publish` (service packages that are meant for PyPI).
 
 
 ## Contributing
 
 See issues labeled with `good-first-issue` or `help-wanted` for ways to contribute!
 
-Questions or suggestions? Email: gio@gmartinez.net
+Questions or suggestions? Email: gio@iqtoolkit.ai
 ---
 
 **Made with ❤️ for Database performance optimization**

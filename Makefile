@@ -5,14 +5,14 @@
 # Python interpreter from virtual environment
 PYTHON := .venv/bin/python
 PIP := .venv/bin/pip
-UV := $(shell command -v uv 2> /dev/null)
+POETRY := $(shell command -v poetry 2> /dev/null)
 
 # Default target
 help:
 	@echo "🚀 Iqtoolkit Analyzer - Development Commands"
 	@echo ""
 	@echo "⚠️  IMPORTANT: All commands require '.venv' directory in repo root!"
-	@echo "   First time: make setup  (uses uv if available, fallback to pip)"
+	@echo "   First time: make setup  (prefers Poetry, falls back to venv/pip)"
 	@echo ""
 	@echo "Setup & Installation:"
 	@echo "  make validate     Check if environment is properly configured"
@@ -38,22 +38,15 @@ help:
 
 # Setup development environment
 setup: hooks install
-	@if [ ! -d ".venv" ]; then \
-		if command -v uv >/dev/null 2>&1; then \
-			echo "📦 Creating '.venv' with uv..."; \
-			uv venv --python 3.11; \
-		else \
+	@if [ -n "$(POETRY)" ]; then \
+		echo "📦 Using Poetry to install (dev,test groups)..."; \
+		poetry install --with dev,test; \
+	else \
+		if [ ! -d ".venv" ]; then \
 			echo "📦 Creating '.venv' with standard venv..."; \
 			python -m venv .venv; \
-		fi \
-	fi
-	@echo "📦 Installing development dependencies..."
-	@if command -v uv >/dev/null 2>&1; then \
-		echo "🚀 Using uv for fast installation"; \
-		uv pip install -r requirements.txt; \
-		uv pip install -e .[dev]; \
-	else \
-		echo "🐍 Using pip for installation"; \
+		fi; \
+		echo "📦 Installing development dependencies with pip..."; \
 		.venv/bin/pip install -r requirements.txt; \
 		.venv/bin/pip install -e .[dev]; \
 	fi
@@ -66,20 +59,14 @@ hooks:
 
 # Install package in development mode
 install:
-	@if [ ! -d ".venv" ]; then \
-		if command -v uv >/dev/null 2>&1; then \
-			echo "📦 Creating '.venv' with uv..."; \
-			uv venv --python 3.11; \
-		else \
+	@if [ -n "$(POETRY)" ]; then \
+		echo "🚀 Installing with Poetry..."; \
+		poetry install; \
+	else \
+		if [ ! -d ".venv" ]; then \
 			echo "📦 Creating '.venv' with standard venv..."; \
 			python -m venv .venv; \
-		fi \
-	fi
-	@if command -v uv >/dev/null 2>&1; then \
-		echo "🚀 Installing with uv..."; \
-		uv pip install -r requirements.txt; \
-		uv pip install -e .; \
-	else \
+		fi; \
 		echo "🐍 Installing with pip..."; \
 		.venv/bin/pip install -r requirements.txt; \
 		.venv/bin/pip install -e .; \
@@ -87,80 +74,57 @@ install:
 
 # Version management
 sync-version:
-	@if [ ! -d ".venv" ]; then \
-		if command -v uv >/dev/null 2>&1; then \
-			echo "📦 Creating '.venv' with uv..."; \
-			uv venv --python 3.11; \
-		else \
+	@echo "🔄 Synchronizing versions..."
+	@if [ -n "$(POETRY)" ]; then \
+		poetry run python scripts/propagate_version.py; \
+	else \
+		if [ ! -d ".venv" ]; then \
 			echo "📦 Creating '.venv' with standard venv..."; \
 			python -m venv .venv; \
-		fi \
-	fi
-	@echo "🔄 Synchronizing versions..."
-	@if command -v uv >/dev/null 2>&1; then \
-		uv pip install -r requirements.txt > /dev/null 2>&1; \
-		uv run python scripts/propagate_version.py; \
-	else \
+		fi; \
 		.venv/bin/pip install -r requirements.txt > /dev/null 2>&1; \
 		.venv/bin/python scripts/propagate_version.py; \
 	fi
 
 check-version:
-	@if [ ! -d ".venv" ]; then \
-		if command -v uv >/dev/null 2>&1; then \
-			echo "📦 Creating '.venv' with uv..."; \
-			uv venv --python 3.11; \
-		else \
+	@echo "🔍 Checking version consistency..."
+	@if [ -n "$(POETRY)" ]; then \
+		poetry run python scripts/propagate_version.py --verify; \
+	else \
+		if [ ! -d ".venv" ]; then \
 			echo "📦 Creating '.venv' with standard venv..."; \
 			python -m venv .venv; \
-		fi \
-	fi
-	@echo "🔍 Checking version consistency..."
-	@if command -v uv >/dev/null 2>&1; then \
-		uv pip install -r requirements.txt > /dev/null 2>&1; \
-		uv run python scripts/propagate_version.py --verify; \
-	else \
+		fi; \
 		.venv/bin/pip install -r requirements.txt > /dev/null 2>&1; \
 		.venv/bin/python scripts/propagate_version.py --verify; \
 	fi
 
 # Dependency management
 update-requirements:
-	@if [ ! -d ".venv" ]; then \
-		if command -v uv >/dev/null 2>&1; then \
-			echo "📦 Creating '.venv' with uv..."; \
-			uv venv --python 3.11; \
-		else \
+	@if [ -n "$(POETRY)" ]; then \
+		echo "📦 Exporting requirements.txt from Poetry..."; \
+		poetry export --without-hashes -f requirements.txt -o requirements.txt; \
+	else \
+		if [ ! -d ".venv" ]; then \
 			echo "📦 Creating '.venv' with standard venv..."; \
 			python -m venv .venv; \
-		fi \
-	fi
-	@if command -v uv >/dev/null 2>&1; then \
-		echo "📦 Updating requirements.txt from pyproject.toml using uv..."; \
-		uv lock; \
-		uv export --frozen --output-file requirements.txt; \
-	else \
+		fi; \
 		echo "📦 Updating requirements.txt using custom script..."; \
 		.venv/bin/pip install -r requirements.txt > /dev/null 2>&1; \
 		.venv/bin/python scripts/update_requirements.py; \
 	fi
 
 # Code formatting
+
 format:
-	@if [ ! -d ".venv" ]; then \
-		if command -v uv >/dev/null 2>&1; then \
-			echo "📦 Creating '.venv' with uv..."; \
-			uv venv --python 3.11; \
-		else \
+	@echo "🎨 Formatting code..."
+	@if [ -n "$(POETRY)" ]; then \
+		poetry run black iqtoolkit_analyzer tests scripts *.py; \
+	else \
+		if [ ! -d ".venv" ]; then \
 			echo "📦 Creating '.venv' with standard venv..."; \
 			python -m venv .venv; \
-		fi \
-	fi
-	@echo "🎨 Formatting code..."
-	@if command -v uv >/dev/null 2>&1; then \
-		uv pip install -r requirements.txt > /dev/null 2>&1; \
-		uv run black iqtoolkit_analyzer tests scripts *.py; \
-	else \
+		fi; \
 		.venv/bin/pip install -r requirements.txt > /dev/null 2>&1; \
 		.venv/bin/python -m black iqtoolkit_analyzer tests scripts *.py; \
 	fi
@@ -168,21 +132,15 @@ format:
 
 # Linting
 lint:
-	@if [ ! -d ".venv" ]; then \
-		if command -v uv >/dev/null 2>&1; then \
-			echo "📦 Creating '.venv' with uv..."; \
-			uv venv --python 3.11; \
-		else \
+	@echo "🔍 Running linting..."
+	@if [ -n "$(POETRY)" ]; then \
+		poetry run flake8 . --max-line-length=88 --extend-ignore=E203,W503 --exclude=.venv,build,dist,*.egg-info,scripts/propagate_version.py; \
+		poetry run mypy iqtoolkit_analyzer --ignore-missing-imports; \
+	else \
+		if [ ! -d ".venv" ]; then \
 			echo "📦 Creating '.venv' with standard venv..."; \
 			python -m venv .venv; \
-		fi \
-	fi
-	@echo "🔍 Running linting..."
-	@if command -v uv >/dev/null 2>&1; then \
-		uv pip install -r requirements.txt > /dev/null 2>&1; \
-		uv run flake8 . --max-line-length=88 --extend-ignore=E203,W503 --exclude=.venv,build,dist,*.egg-info,scripts/propagate_version.py; \
-		uv run mypy iqtoolkit_analyzer --ignore-missing-imports; \
-	else \
+		fi; \
 		.venv/bin/pip install -r requirements.txt > /dev/null 2>&1; \
 		.venv/bin/python -m flake8 . --max-line-length=88 --extend-ignore=E203,W503 --exclude=.venv,build,dist,*.egg-info,scripts/propagate_version.py; \
 		.venv/bin/python -m mypy iqtoolkit_analyzer --ignore-missing-imports; \
@@ -191,20 +149,14 @@ lint:
 
 # Run tests
 test:
-	@if [ ! -d ".venv" ]; then \
-		if command -v uv >/dev/null 2>&1; then \
-			echo "📦 Creating '.venv' with uv..."; \
-			uv venv --python 3.11; \
-		else \
+	@echo "🧪 Running tests..."
+	@if [ -n "$(POETRY)" ]; then \
+		poetry run pytest tests/ --cov=iqtoolkit_analyzer --cov-report=term-missing --cov-report=html; \
+	else \
+		if [ ! -d ".venv" ]; then \
 			echo "📦 Creating '.venv' with standard venv..."; \
 			python -m venv .venv; \
-		fi \
-	fi
-	@echo "🧪 Running tests..."
-	@if command -v uv >/dev/null 2>&1; then \
-		uv pip install -r requirements.txt > /dev/null 2>&1; \
-		uv run pytest tests/ --cov=iqtoolkit_analyzer --cov-report=term-missing --cov-report=html; \
-	else \
+		fi; \
 		.venv/bin/pip install -r requirements.txt > /dev/null 2>&1; \
 		.venv/bin/python -m pytest tests/ --cov=iqtoolkit_analyzer --cov-report=term-missing --cov-report=html; \
 	fi
@@ -213,8 +165,8 @@ test:
 # Test Ollama setup
 test-ollama:
 	@echo "🤖 Testing Ollama setup..."
-	@if command -v uv >/dev/null 2>&1; then \
-		uv run python scripts/test_ollama.py; \
+	@if [ -n "$(POETRY)" ]; then \
+		poetry run python scripts/test_ollama.py; \
 	else \
 		.venv/bin/python scripts/test_ollama.py; \
 	fi

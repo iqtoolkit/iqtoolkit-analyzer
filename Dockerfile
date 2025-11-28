@@ -37,7 +37,7 @@ FROM python:3.11-slim AS production
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PATH="/opt/venv/bin:$PATH" \
-    IQTOOLKIT_ANALYZER_VERSION=0.2.2a1
+    IQTOOLKIT_ANALYZER_VERSION=0.2.3a1
 
 # Create non-root user for security
 RUN groupadd --gid 1001 appuser && \
@@ -71,11 +71,11 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 
 # Labels for metadata
 LABEL maintainer="Giovanni Martinez <gio@iqtoolkit.ai>" \
-      version="0.2.2a1" \
+    version="0.2.3a1" \
       description="AI-powered multi-database performance analyzer" \
       org.opencontainers.image.title="IQToolkit Analyzer" \
       org.opencontainers.image.description="AI-powered multi-database performance analyzer" \
-      org.opencontainers.image.version="0.2.2a1" \
+    org.opencontainers.image.version="0.2.3a1" \
       org.opencontainers.image.authors="Giovanni Martinez <gio@iqtoolkit.ai>" \
       org.opencontainers.image.source="https://github.com/iqtoolkit/iqtoolkit-analyzer" \
       org.opencontainers.image.licenses="MIT"
@@ -83,4 +83,4 @@ LABEL maintainer="Giovanni Martinez <gio@iqtoolkit.ai>" \
 # Default command
 ENTRYPOINT ["iqtoolkit-analyzer"]
 CMD ["--help"]
-LABEL version="0.2.2a1"
+LABEL version="0.2.3a1"
