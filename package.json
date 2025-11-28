@@ -1,6 +1,6 @@
 {
   "name": "iqtoolkit-analyzer-dev",
-  "version": "0.2.2a1",
+  "version": "0.2.3a1",
   "private": true,
   "description": "Development dependencies for Iqtoolkit Analyzer",
   "devDependencies": {

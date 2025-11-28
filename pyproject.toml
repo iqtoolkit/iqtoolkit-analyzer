@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "iqtoolkit-analyzer"
-version = "0.2.2"
+version = "0.2.3a1"
 description = "AI-powered multi-database performance analyzer for PostgreSQL and MongoDB with privacy-first intelligence"
 readme = "README.md"
 license = "MIT"
