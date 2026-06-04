@@ -35,7 +35,10 @@ func parseLine(line string) (Entry, bool) {
 	if m == nil {
 		return Entry{}, false
 	}
-	ts, _ := time.Parse("2006-01-02 15:04:05.000 MST", m[1])
+	ts, err := time.Parse("2006-01-02 15:04:05.000 MST", m[1])
+	if err != nil {
+		return Entry{}, false
+	}
 	e := Entry{Timestamp: ts, Level: m[2], Message: m[3]}
 	if dm := durationRe.FindStringSubmatch(line); dm != nil {
 		// parse ms as duration
