@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/iqtoolkit/iqtoolkit-analyzer/internal/ai"
 	"github.com/iqtoolkit/iqtoolkit-analyzer/internal/dbconn"
 	"github.com/iqtoolkit/iqtoolkit-analyzer/internal/logparser"
 	"github.com/iqtoolkit/iqtoolkit-analyzer/internal/metrics"
@@ -19,6 +20,7 @@ func main() {
 
 	var dsn, logFile string
 	var slowThreshold int
+	var aiProvider, aiModel string
 
 	analyze := &cobra.Command{
 		Use:   "analyze",
@@ -74,6 +76,37 @@ func main() {
 				fmt.Println("\nNo recommendations — configuration looks good!")
 			}
 
+			// AI-enhanced analysis
+			if aiProvider != "" {
+				client, err := ai.ClientFromConfig(ai.Provider(aiProvider))
+				if err != nil {
+					return fmt.Errorf("configuring AI provider: %w", err)
+				}
+				model := aiModel
+				if model == "" {
+					switch ai.Provider(aiProvider) {
+					case ai.OpenAI:
+						model = "gpt-4o"
+					case ai.Anthropic:
+						model = "claude-sonnet-4-20250514"
+					case ai.Gemini:
+						model = "gemini-2.5-pro"
+					case ai.Kiro:
+						model = "anthropic.claude-sonnet-4-20250514-v1:0"
+					}
+				}
+				prompt := ai.BuildPrompt(report)
+				resp, err := client.Complete(ctx, ai.Request{
+					Model:    model,
+					System:   "You are a PostgreSQL performance tuning expert. Analyze the provided metrics and settings, then give concise, prioritized recommendations.",
+					Messages: []ai.Message{{Role: "user", Content: prompt}},
+				})
+				if err != nil {
+					return fmt.Errorf("AI analysis failed: %w", err)
+				}
+				fmt.Printf("\n=== AI-Enhanced Recommendations ===\n%s\n", resp.Content)
+			}
+
 			return nil
 		},
 	}
@@ -81,6 +114,8 @@ func main() {
 	analyze.Flags().StringVar(&dsn, "dsn", "", "PostgreSQL connection string")
 	analyze.Flags().StringVar(&logFile, "log-file", "", "Path to PostgreSQL log file")
 	analyze.Flags().IntVar(&slowThreshold, "slow-threshold", 1000, "Slow query threshold in milliseconds")
+	analyze.Flags().StringVar(&aiProvider, "ai-provider", "", "AI provider for enhanced analysis (openai, anthropic, gemini, kiro)")
+	analyze.Flags().StringVar(&aiModel, "ai-model", "", "AI model override (default: provider-specific)")
 	analyze.MarkFlagRequired("dsn")
 	analyze.MarkFlagRequired("log-file")
 

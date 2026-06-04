@@ -118,6 +118,12 @@ iqtoolkit-analyzer analyze --dsn "postgres://user:pass@localhost:5432/mydb" --lo
 # Adjust the slow query threshold (default unit: milliseconds)
 iqtoolkit-analyzer analyze --dsn "postgres://user:pass@localhost:5432/mydb" --log-file /var/log/postgresql/postgresql.log --slow-threshold 500
 
+# Include AI-enhanced recommendations (requires API key configured)
+iqtoolkit-analyzer analyze --dsn "postgres://user:pass@localhost:5432/mydb" --log-file /var/log/postgresql/postgresql.log --ai-provider openai
+
+# Use a specific AI model
+iqtoolkit-analyzer analyze --dsn "postgres://user:pass@localhost:5432/mydb" --log-file /var/log/postgresql/postgresql.log --ai-provider anthropic --ai-model claude-sonnet-4-20250514
+
 # Generate an HTML report with all settings, extensions, and version
 iqtoolkit-analyzer report --dsn "postgres://user:pass@localhost:5432/mydb" --output report.html
 ```
@@ -126,6 +132,7 @@ The `analyze` command outputs:
 - Summary metrics (total entries, error count, slow queries, average duration)
 - Peak error times by hour
 - Categorized recommendations with severity levels
+- AI-enhanced tuning recommendations (when `--ai-provider` is specified)
 
 The `report` command generates a self-contained HTML file containing:
 - PostgreSQL server version
