@@ -14,6 +14,10 @@ type Report struct {
 	Settings       []dbconn.Setting
 	AvgDuration    time.Duration
 	PeakErrorTime  time.Time
+	Statements     []dbconn.StatStatement
+	Tables         []dbconn.TableStat
+	Indexes        []dbconn.IndexStat
+	BufferCache    []dbconn.BufferCacheStat
 }
 
 func Analyze(entries []logparser.Entry, settings []dbconn.Setting, slowThreshold time.Duration) *Report {

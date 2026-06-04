@@ -52,8 +52,38 @@ func main() {
 				return fmt.Errorf("fetching settings: %w", err)
 			}
 
+			// Check required extensions and collect stats
+			for _, ext := range dbconn.RequiredExtensions {
+				status, err := conn.CheckExtension(ctx, ext)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Warning: could not check extension %s: %v\n", ext, err)
+					continue
+				}
+				if !status.Installed {
+					if status.Available {
+						fmt.Fprintf(os.Stderr, "Extension %q is available but not installed. Run: CREATE EXTENSION %s;\n", ext, ext)
+					} else {
+						fmt.Fprintf(os.Stderr, "Extension %q is not available on this server.\n", ext)
+					}
+				}
+			}
+
 			// Analyze metrics
 			report := metrics.Analyze(entries, settings, time.Duration(slowThreshold)*time.Millisecond)
+
+			// Collect extended stats (best-effort)
+			if stmts, err := conn.StatStatements(ctx, 20); err == nil {
+				report.Statements = stmts
+			}
+			if tables, err := conn.StatUserTables(ctx); err == nil {
+				report.Tables = tables
+			}
+			if indexes, err := conn.StatUserIndexes(ctx); err == nil {
+				report.Indexes = indexes
+			}
+			if bc, err := conn.StatBufferCache(ctx, 20); err == nil {
+				report.BufferCache = bc
+			}
 
 			// Print summary
 			fmt.Printf("=== Summary ===\n")
