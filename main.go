@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime/debug"
 	"time"
 
 	"github.com/iqtoolkit/iqtoolkit-analyzer/internal/ai"
@@ -17,20 +18,43 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Set via -ldflags at build time:
+// Set via -ldflags at build time, or auto-detected from go install:
 //
 //	go build -ldflags "-X main.version=v1.0.0 -X main.commit=abc1234 -X main.date=2026-06-04"
 var (
-	version = "dev"
-	commit  = "unknown"
-	date    = "unknown"
+	version = ""
+	commit  = ""
+	date    = ""
 )
 
 func formatVersion() string {
-	if version == "dev" {
+	if version == "" {
+		// Auto-detect from go install metadata (uses git tag)
+		if info, ok := debug.ReadBuildInfo(); ok && info.Main.Version != "" && info.Main.Version != "(devel)" {
+			version = info.Main.Version
+			for _, s := range info.Settings {
+				switch s.Key {
+				case "vcs.revision":
+					if len(s.Value) > 7 {
+						commit = s.Value[:7]
+					} else {
+						commit = s.Value
+					}
+				case "vcs.time":
+					if t, err := time.Parse(time.RFC3339, s.Value); err == nil {
+						date = t.Format("2006-01-02")
+					}
+				}
+			}
+		}
+	}
+	if version == "" {
 		return "dev"
 	}
-	return fmt.Sprintf("%s (%s, %s)", version, commit, date)
+	if commit != "" {
+		return fmt.Sprintf("%s (%s, %s)", version, commit, date)
+	}
+	return version
 }
 
 func main() {
