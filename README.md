@@ -14,6 +14,7 @@ Recommendations are categorized by concern (performance, configuration, reliabil
 - **Metrics Analysis** - Calculates total log entries, error counts, slow query counts, average query duration, and peak error times (by hour).
 - **Configuration Review** - Connects to PostgreSQL and inspects runtime settings via `pg_settings`, checking for suboptimal values in parameters like `shared_buffers`, `work_mem`, and `log_min_duration_statement`.
 - **Actionable Recommendations** - Generates prioritized suggestions based on collected metrics, flagging high average query durations, excessive slow queries, elevated error counts, and misconfigured parameters.
+- **AI-Enhanced Analysis** - Optionally sends metrics to an AI provider (OpenAI, Anthropic, Gemini, or Kiro/Amazon Bedrock) for deeper tuning recommendations beyond rule-based checks.
 - **HTML Report** - Generates a self-contained HTML report with all `pg_settings`, installed and available extensions (with versions), and the PostgreSQL server version.
 
 ## How It Works
@@ -22,18 +23,59 @@ Recommendations are categorized by concern (performance, configuration, reliabil
 PostgreSQL Logs ──> Log Parser ──> Metrics Analyzer ──┐
                                                       ├──> Recommendation Engine ──> Report
 PostgreSQL DB ───> Config Reader ─────────────────────┘
+                                                      │
+                                                      └──> AI Context Builder ──> AI Provider ──> Enhanced Recommendations
 ```
 
 1. The **log parser** reads PostgreSQL log files and extracts structured entries (timestamp, level, message, duration).
 2. The **database connector** queries `pg_settings` to retrieve current configuration values and their sources.
 3. The **metrics analyzer** processes parsed log entries and database settings into a summary report.
 4. The **recommendation engine** evaluates the report against best-practice thresholds and produces categorized, severity-rated suggestions.
+5. The **AI context builder** formats metrics and settings into a structured prompt, then sends it to a configured AI provider (OpenAI, Anthropic, Gemini, or Kiro/Bedrock) for enhanced tuning recommendations.
+
+## AI Provider Configuration
+
+iqtoolkit-analyzer can use AI providers (OpenAI, Anthropic, Gemini, or Kiro/Amazon Bedrock) to generate enhanced tuning recommendations from your PostgreSQL metrics.
+
+### Environment Variables
+
+Set the API key for your chosen provider:
+
+```bash
+# OpenAI
+export OPENAI_API_KEY="sk-..."
+
+# Anthropic
+export ANTHROPIC_API_KEY="sk-ant-..."
+
+# Google Gemini
+export GEMINI_API_KEY="AI..."
+
+# Kiro (Amazon Bedrock) — uses standard AWS credentials (env vars, profile, or IMDS)
+export AWS_REGION="us-east-1"
+```
+
+### Config File
+
+Alternatively, create `~/.config/iqtoolkit-analyzer/config.json`:
+
+```json
+{
+  "openai_api_key": "sk-...",
+  "anthropic_api_key": "sk-ant-...",
+  "gemini_api_key": "AI...",
+  "aws_region": "us-east-1"
+}
+```
+
+Environment variables take precedence over the config file.
 
 ## Project Structure
 
 ```
 iqtoolkit-analyzer/
 ├── internal/
+│   ├── ai/                 # AI provider clients and prompt building
 │   ├── dbconn/             # Database connection and pg_settings queries
 │   ├── logparser/          # PostgreSQL log file parsing
 │   ├── metrics/            # Log and config analysis into reports
