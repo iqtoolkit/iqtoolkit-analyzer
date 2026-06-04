@@ -43,6 +43,4 @@ func (c *Conn) Settings(ctx context.Context) ([]Setting, error) {
 	return settings, rows.Err()
 }
 
-func (c *Conn) Query(ctx context.Context, q string) (pgx.Rows, error) {
-	return c.conn.Query(ctx, q)
-}
+
