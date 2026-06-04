@@ -125,6 +125,12 @@ iqtoolkit-analyzer analyze --dsn "postgres://user:pass@localhost:5432/mydb" --lo
 # Use a specific AI model
 iqtoolkit-analyzer analyze --dsn "postgres://user:pass@localhost:5432/mydb" --log-file /var/log/postgresql/postgresql.log --ai-provider anthropic --ai-model claude-sonnet-4-20250514
 
+# Output as JSON to a file
+iqtoolkit-analyzer analyze --dsn "postgres://user:pass@localhost:5432/mydb" --log-file /var/log/postgresql/postgresql.log --format json --output analysis.json
+
+# Output as Markdown
+iqtoolkit-analyzer analyze --dsn "postgres://user:pass@localhost:5432/mydb" --log-file /var/log/postgresql/postgresql.log --format markdown --output analysis.md
+
 # Generate an HTML report with all settings, extensions, and version
 iqtoolkit-analyzer report --dsn "postgres://user:pass@localhost:5432/mydb" --output report.html
 ```
@@ -134,6 +140,8 @@ The `analyze` command outputs:
 - Peak error times by hour
 - Categorized recommendations with severity levels
 - AI-enhanced tuning recommendations (when `--ai-provider` is specified)
+
+Output can be formatted as plain text (default), JSON (`--format json`), or Markdown (`--format markdown`). Use `--output <file>` to write to a file instead of stdout.
 
 The `report` command generates a self-contained HTML file containing:
 - PostgreSQL server version

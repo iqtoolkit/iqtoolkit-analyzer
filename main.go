@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"time"
 
@@ -21,6 +23,7 @@ func main() {
 	var dsn, logFile string
 	var slowThreshold int
 	var aiProvider, aiModel string
+	var outputFile, outputFormat string
 
 	analyze := &cobra.Command{
 		Use:   "analyze",
@@ -85,28 +88,11 @@ func main() {
 				report.BufferCache = bc
 			}
 
-			// Print summary
-			fmt.Printf("=== Summary ===\n")
-			fmt.Printf("Total entries:    %d\n", report.TotalEntries)
-			fmt.Printf("Error count:      %d\n", report.ErrorCount)
-			fmt.Printf("Slow queries:     %d\n", len(report.SlowQueries))
-			fmt.Printf("Avg duration:     %v\n", report.AvgDuration)
-			if !report.PeakErrorTime.IsZero() {
-				fmt.Printf("Peak error time:  %v\n", report.PeakErrorTime)
-			}
-
-			// Generate and print recommendations
+			// Generate recommendations
 			recs := recommendations.Generate(report)
-			if len(recs) > 0 {
-				fmt.Printf("\n=== Recommendations ===\n")
-				for _, r := range recs {
-					fmt.Printf("[%s][%s] %s\n", r.Severity, r.Category, r.Message)
-				}
-			} else {
-				fmt.Println("\nNo recommendations — configuration looks good!")
-			}
 
 			// AI-enhanced analysis
+			var aiContent string
 			if aiProvider != "" {
 				client, err := ai.ClientFromConfig(ai.Provider(aiProvider))
 				if err != nil {
@@ -134,7 +120,103 @@ func main() {
 				if err != nil {
 					return fmt.Errorf("AI analysis failed: %w", err)
 				}
-				fmt.Printf("\n=== AI-Enhanced Recommendations ===\n%s\n", resp.Content)
+				aiContent = resp.Content
+			}
+
+			// Determine output writer
+			var w io.Writer = os.Stdout
+			if outputFile != "" {
+				of, err := os.Create(outputFile)
+				if err != nil {
+					return fmt.Errorf("creating output file: %w", err)
+				}
+				defer of.Close()
+				w = of
+			}
+
+			switch outputFormat {
+			case "json":
+				out := struct {
+					Summary struct {
+						TotalEntries  int    `json:"total_entries"`
+						ErrorCount    int    `json:"error_count"`
+						SlowQueries   int    `json:"slow_queries"`
+						AvgDuration   string `json:"avg_duration"`
+						PeakErrorTime string `json:"peak_error_time,omitempty"`
+					} `json:"summary"`
+					Recommendations []struct {
+						Severity string `json:"severity"`
+						Category string `json:"category"`
+						Message  string `json:"message"`
+					} `json:"recommendations"`
+					AIRecommendations string `json:"ai_recommendations,omitempty"`
+				}{}
+				out.Summary.TotalEntries = report.TotalEntries
+				out.Summary.ErrorCount = report.ErrorCount
+				out.Summary.SlowQueries = len(report.SlowQueries)
+				out.Summary.AvgDuration = report.AvgDuration.String()
+				if !report.PeakErrorTime.IsZero() {
+					out.Summary.PeakErrorTime = report.PeakErrorTime.Format(time.RFC3339)
+				}
+				for _, r := range recs {
+					out.Recommendations = append(out.Recommendations, struct {
+						Severity string `json:"severity"`
+						Category string `json:"category"`
+						Message  string `json:"message"`
+					}{r.Severity, r.Category, r.Message})
+				}
+				out.AIRecommendations = aiContent
+				enc := json.NewEncoder(w)
+				enc.SetIndent("", "  ")
+				if err := enc.Encode(out); err != nil {
+					return err
+				}
+
+			case "markdown":
+				fmt.Fprintf(w, "# PostgreSQL Analysis Report\n\n")
+				fmt.Fprintf(w, "## Summary\n\n")
+				fmt.Fprintf(w, "| Metric | Value |\n|--------|-------|\n")
+				fmt.Fprintf(w, "| Total entries | %d |\n", report.TotalEntries)
+				fmt.Fprintf(w, "| Error count | %d |\n", report.ErrorCount)
+				fmt.Fprintf(w, "| Slow queries | %d |\n", len(report.SlowQueries))
+				fmt.Fprintf(w, "| Avg duration | %v |\n", report.AvgDuration)
+				if !report.PeakErrorTime.IsZero() {
+					fmt.Fprintf(w, "| Peak error time | %v |\n", report.PeakErrorTime)
+				}
+				if len(recs) > 0 {
+					fmt.Fprintf(w, "\n## Recommendations\n\n")
+					for _, r := range recs {
+						fmt.Fprintf(w, "- **[%s]** (%s) %s\n", r.Severity, r.Category, r.Message)
+					}
+				}
+				if aiContent != "" {
+					fmt.Fprintf(w, "\n## AI-Enhanced Recommendations\n\n%s\n", aiContent)
+				}
+
+			default: // text
+				fmt.Fprintf(w, "=== Summary ===\n")
+				fmt.Fprintf(w, "Total entries:    %d\n", report.TotalEntries)
+				fmt.Fprintf(w, "Error count:      %d\n", report.ErrorCount)
+				fmt.Fprintf(w, "Slow queries:     %d\n", len(report.SlowQueries))
+				fmt.Fprintf(w, "Avg duration:     %v\n", report.AvgDuration)
+				if !report.PeakErrorTime.IsZero() {
+					fmt.Fprintf(w, "Peak error time:  %v\n", report.PeakErrorTime)
+				}
+				if len(recs) > 0 {
+					fmt.Fprintf(w, "\n=== Recommendations ===\n")
+					for _, r := range recs {
+						fmt.Fprintf(w, "[%s][%s] %s\n", r.Severity, r.Category, r.Message)
+					}
+				} else {
+					fmt.Fprintln(w, "\nNo recommendations — configuration looks good!")
+				}
+				if aiContent != "" {
+					fmt.Fprintf(w, "\n=== AI-Enhanced Recommendations ===\n%s\n", aiContent)
+				}
+			}
+
+			if outputFile != "" {
+				fmt.Fprintf(os.Stderr, "Report written to %s\n", outputFile)
 			}
 
 			return nil
@@ -146,6 +228,8 @@ func main() {
 	analyze.Flags().IntVar(&slowThreshold, "slow-threshold", 1000, "Slow query threshold in milliseconds")
 	analyze.Flags().StringVar(&aiProvider, "ai-provider", "", "AI provider for enhanced analysis (openai, anthropic, gemini, kiro)")
 	analyze.Flags().StringVar(&aiModel, "ai-model", "", "AI model override (default: provider-specific)")
+	analyze.Flags().StringVar(&outputFile, "output", "", "Write output to file instead of stdout")
+	analyze.Flags().StringVar(&outputFormat, "format", "text", "Output format: text, json, or markdown")
 	analyze.MarkFlagRequired("dsn")
 	analyze.MarkFlagRequired("log-file")
 
