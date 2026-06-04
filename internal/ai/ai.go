@@ -218,16 +218,6 @@ func (c *Client) completeAnthropic(ctx context.Context, req Request) (*Response,
 
 func (c *Client) completeGemini(ctx context.Context, req Request) (*Response, error) {
 	var contents []map[string]any
-	if req.System != "" {
-		contents = append(contents, map[string]any{
-			"role":  "user",
-			"parts": []map[string]string{{"text": req.System}},
-		})
-		contents = append(contents, map[string]any{
-			"role":  "model",
-			"parts": []map[string]string{{"text": "Understood."}},
-		})
-	}
 	for _, m := range req.Messages {
 		role := m.Role
 		if role == "assistant" {
@@ -238,7 +228,13 @@ func (c *Client) completeGemini(ctx context.Context, req Request) (*Response, er
 			"parts": []map[string]string{{"text": m.Content}},
 		})
 	}
-	body, _ := json.Marshal(map[string]any{"contents": contents})
+	payload := map[string]any{"contents": contents}
+	if req.System != "" {
+		payload["systemInstruction"] = map[string]any{
+			"parts": []map[string]string{{"text": req.System}},
+		}
+	}
+	body, _ := json.Marshal(payload)
 	url := fmt.Sprintf("https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent?key=%s", req.Model, c.APIKey)
 	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(body))
 	if err != nil {
