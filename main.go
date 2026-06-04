@@ -42,6 +42,7 @@ func main() {
 	var slowThreshold int
 	var aiProvider, aiModel string
 	var outputFile, outputFormat string
+	var logFormat string
 
 	analyze := &cobra.Command{
 		Use:   "analyze",
@@ -56,7 +57,7 @@ func main() {
 			}
 			defer f.Close()
 
-			entries, err := logparser.Parse(f)
+			entries, err := logparser.ParseFormat(f, logparser.Format(logFormat))
 			if err != nil {
 				return fmt.Errorf("parsing log file: %w", err)
 			}
@@ -243,6 +244,7 @@ func main() {
 
 	analyze.Flags().StringVar(&dsn, "dsn", "", "PostgreSQL connection string")
 	analyze.Flags().StringVar(&logFile, "log-file", "", "Path to PostgreSQL log file")
+	analyze.Flags().StringVar(&logFormat, "log-format", "", "Log format: stderr, csvlog, jsonlog (default: auto-detect)")
 	analyze.Flags().IntVar(&slowThreshold, "slow-threshold", 1000, "Slow query threshold in milliseconds")
 	analyze.Flags().StringVar(&aiProvider, "ai-provider", "", "AI provider for enhanced analysis (openai, anthropic, gemini, kiro)")
 	analyze.Flags().StringVar(&aiModel, "ai-model", "", "AI model override (default: provider-specific)")

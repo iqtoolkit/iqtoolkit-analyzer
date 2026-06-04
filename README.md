@@ -10,7 +10,7 @@ Recommendations are categorized by concern (performance, configuration, reliabil
 
 ## Features
 
-- **Log Parsing** - Extracts timestamps, log levels, messages, and query durations from PostgreSQL log files. Identifies slow queries by configurable duration thresholds.
+- **Log Parsing** - Extracts timestamps, log levels, messages, and query durations from PostgreSQL log files. Supports `stderr` (default), `csvlog`, and `jsonlog` formats with auto-detection. Identifies slow queries by configurable duration thresholds.
 - **Metrics Analysis** - Calculates total log entries, error counts, slow query counts, average query duration, and peak error times (by hour).
 - **Configuration Review** - Connects to PostgreSQL and inspects runtime settings via `pg_settings`, checking for suboptimal values in parameters like `shared_buffers`, `work_mem`, and `log_min_duration_statement`.
 - **Extended Data Collection** - Queries `pg_stat_statements` (top queries by time), `pg_stat_user_tables` (sequential scans, dead tuples), `pg_stat_user_indexes` (unused indexes), and `pg_buffercache` (buffer cache usage). Automatically checks if required extensions are installed and prompts you to create them if not.

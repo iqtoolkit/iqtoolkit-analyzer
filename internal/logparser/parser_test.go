@@ -49,7 +49,7 @@ func TestParseLine(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e, ok := parseLine(tt.line)
+			e, ok := parseStderrLine(tt.line)
 			if ok != tt.wantOK {
 				t.Fatalf("parseLine() ok = %v, want %v", ok, tt.wantOK)
 			}
