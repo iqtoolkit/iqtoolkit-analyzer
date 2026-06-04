@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -48,6 +49,7 @@ type Client struct {
 	Provider   Provider
 	APIKey     string
 	Region     string // AWS region for Kiro/Bedrock
+	MaxRetries int    // retry attempts on transient errors (default: 3)
 	HTTPClient *http.Client
 }
 
@@ -56,8 +58,58 @@ func NewClient(provider Provider, apiKey string) *Client {
 	return &Client{Provider: provider, APIKey: apiKey, HTTPClient: http.DefaultClient}
 }
 
-// Complete sends a chat completion request and returns the response text.
+// Complete sends a chat completion request with retry on transient failures.
 func (c *Client) Complete(ctx context.Context, req Request) (*Response, error) {
+	var resp *Response
+	var err error
+	for attempt := range c.maxRetries() {
+		resp, err = c.dispatch(ctx, req)
+		if err == nil {
+			return resp, nil
+		}
+		if !isRetryable(err) {
+			return nil, err
+		}
+		delay := time.Duration(1<<attempt) * time.Second // 1s, 2s, 4s
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		case <-time.After(delay):
+		}
+	}
+	return nil, err
+}
+
+func (c *Client) maxRetries() int {
+	if c.MaxRetries > 0 {
+		return c.MaxRetries
+	}
+	return 3
+}
+
+func isRetryable(err error) bool {
+	s := err.Error()
+	// Retry on rate limits (429), server errors (5xx), and generic network errors
+	return contains(s, "429") || contains(s, "500") || contains(s, "502") ||
+		contains(s, "503") || contains(s, "504") ||
+		contains(s, "connection refused") || contains(s, "timeout") ||
+		contains(s, "EOF")
+}
+
+func contains(s, substr string) bool {
+	return len(s) >= len(substr) && (s == substr || len(s) > 0 && stringContains(s, substr))
+}
+
+func stringContains(s, sub string) bool {
+	for i := 0; i <= len(s)-len(sub); i++ {
+		if s[i:i+len(sub)] == sub {
+			return true
+		}
+	}
+	return false
+}
+
+func (c *Client) dispatch(ctx context.Context, req Request) (*Response, error) {
 	switch c.Provider {
 	case OpenAI:
 		return c.completeOpenAI(ctx, req)
