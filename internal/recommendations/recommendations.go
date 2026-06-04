@@ -43,7 +43,8 @@ func Generate(report *metrics.Report) []Recommendation {
 	for _, s := range report.Settings {
 		switch s.Name {
 		case "shared_buffers":
-			if s.Value == "128MB" || s.Value == "128kB" {
+			// pg_settings stores shared_buffers in 8kB pages; 16384 pages = 128MB (default)
+			if s.Value == "16384" || s.Value == "1024" {
 				recs = append(recs, Recommendation{
 					Severity: "warning",
 					Category: "configuration",
@@ -51,7 +52,8 @@ func Generate(report *metrics.Report) []Recommendation {
 				})
 			}
 		case "work_mem":
-			if s.Value == "4MB" {
+			// pg_settings stores work_mem in kB; 4096 = 4MB (default)
+			if s.Value == "4096" {
 				recs = append(recs, Recommendation{
 					Severity: "info",
 					Category: "configuration",

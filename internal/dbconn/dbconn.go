@@ -2,6 +2,7 @@ package dbconn
 
 import (
 	"context"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -17,6 +18,8 @@ type Setting struct {
 }
 
 func Connect(ctx context.Context, dsn string) (*Conn, error) {
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
 	conn, err := pgx.Connect(ctx, dsn)
 	if err != nil {
 		return nil, err
