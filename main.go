@@ -17,8 +17,26 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Set via -ldflags at build time:
+//
+//	go build -ldflags "-X main.version=v1.0.0 -X main.commit=abc1234 -X main.date=2026-06-04"
+var (
+	version = "dev"
+	commit  = "unknown"
+	date    = "unknown"
+)
+
+func formatVersion() string {
+	if version == "dev" {
+		return "dev"
+	}
+	return fmt.Sprintf("%s (%s, %s)", version, commit, date)
+}
+
 func main() {
 	root := &cobra.Command{Use: "iqtoolkit-analyzer", Short: "PostgreSQL health checking and performance tuning recommendations"}
+	root.Version = formatVersion()
+	root.SetVersionTemplate("{{.Version}}\n")
 
 	var dsn, logFile string
 	var slowThreshold int
