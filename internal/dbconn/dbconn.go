@@ -27,7 +27,37 @@ func Connect(ctx context.Context, dsn string) (*Conn, error) {
 	return &Conn{conn: conn}, nil
 }
 
+type Extension struct {
+	Name             string
+	DefaultVersion   string
+	InstalledVersion string // empty if not installed
+}
+
 func (c *Conn) Close(ctx context.Context) error { return c.conn.Close(ctx) }
+
+func (c *Conn) Version(ctx context.Context) (string, error) {
+	var v string
+	err := c.conn.QueryRow(ctx, "SELECT version()").Scan(&v)
+	return v, err
+}
+
+func (c *Conn) Extensions(ctx context.Context) ([]Extension, error) {
+	rows, err := c.conn.Query(ctx, `SELECT a.name, a.default_version, COALESCE(i.extversion, '') 
+		FROM pg_available_extensions a LEFT JOIN pg_extension i ON a.name = i.extname ORDER BY a.name`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var exts []Extension
+	for rows.Next() {
+		var e Extension
+		if err := rows.Scan(&e.Name, &e.DefaultVersion, &e.InstalledVersion); err != nil {
+			return nil, err
+		}
+		exts = append(exts, e)
+	}
+	return exts, rows.Err()
+}
 
 func (c *Conn) Settings(ctx context.Context) ([]Setting, error) {
 	rows, err := c.conn.Query(ctx, "SELECT name, setting, source FROM pg_settings")

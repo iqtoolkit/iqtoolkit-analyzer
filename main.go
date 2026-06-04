@@ -10,6 +10,7 @@ import (
 	"github.com/iqtoolkit/iqtoolkit-analyzer/internal/logparser"
 	"github.com/iqtoolkit/iqtoolkit-analyzer/internal/metrics"
 	"github.com/iqtoolkit/iqtoolkit-analyzer/internal/recommendations"
+	"github.com/iqtoolkit/iqtoolkit-analyzer/internal/report"
 	"github.com/spf13/cobra"
 )
 
@@ -84,6 +85,55 @@ func main() {
 	analyze.MarkFlagRequired("log-file")
 
 	root.AddCommand(analyze)
+
+	var reportDSN, reportOutput string
+	reportCmd := &cobra.Command{
+		Use:   "report",
+		Short: "Generate an HTML report with settings, extensions, and version",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := context.Background()
+			conn, err := dbconn.Connect(ctx, reportDSN)
+			if err != nil {
+				return fmt.Errorf("connecting to database: %w", err)
+			}
+			defer conn.Close(ctx)
+
+			version, err := conn.Version(ctx)
+			if err != nil {
+				return fmt.Errorf("fetching version: %w", err)
+			}
+			settings, err := conn.Settings(ctx)
+			if err != nil {
+				return fmt.Errorf("fetching settings: %w", err)
+			}
+			extensions, err := conn.Extensions(ctx)
+			if err != nil {
+				return fmt.Errorf("fetching extensions: %w", err)
+			}
+
+			f, err := os.Create(reportOutput)
+			if err != nil {
+				return fmt.Errorf("creating output file: %w", err)
+			}
+			defer f.Close()
+
+			err = report.Generate(f, report.Data{
+				Version:     version,
+				Settings:    settings,
+				Extensions:  extensions,
+				GeneratedAt: time.Now(),
+			})
+			if err != nil {
+				return fmt.Errorf("generating report: %w", err)
+			}
+			fmt.Printf("Report written to %s\n", reportOutput)
+			return nil
+		},
+	}
+	reportCmd.Flags().StringVar(&reportDSN, "dsn", "", "PostgreSQL connection string")
+	reportCmd.Flags().StringVar(&reportOutput, "output", "report.html", "Output HTML file path")
+	reportCmd.MarkFlagRequired("dsn")
+	root.AddCommand(reportCmd)
 
 	if err := root.Execute(); err != nil {
 		os.Exit(1)

@@ -14,6 +14,7 @@ Recommendations are categorized by concern (performance, configuration, reliabil
 - **Metrics Analysis** - Calculates total log entries, error counts, slow query counts, average query duration, and peak error times (by hour).
 - **Configuration Review** - Connects to PostgreSQL and inspects runtime settings via `pg_settings`, checking for suboptimal values in parameters like `shared_buffers`, `work_mem`, and `log_min_duration_statement`.
 - **Actionable Recommendations** - Generates prioritized suggestions based on collected metrics, flagging high average query durations, excessive slow queries, elevated error counts, and misconfigured parameters.
+- **HTML Report** - Generates a self-contained HTML report with all `pg_settings`, installed and available extensions (with versions), and the PostgreSQL server version.
 
 ## How It Works
 
@@ -36,7 +37,8 @@ iqtoolkit-analyzer/
 │   ├── dbconn/             # Database connection and pg_settings queries
 │   ├── logparser/          # PostgreSQL log file parsing
 │   ├── metrics/            # Log and config analysis into reports
-│   └── recommendations/    # Recommendation generation from metrics
+│   ├── recommendations/    # Recommendation generation from metrics
+│   └── report/             # HTML report generation
 ├── go.mod
 ├── go.sum
 ├── LICENSE
@@ -73,12 +75,20 @@ iqtoolkit-analyzer analyze --dsn "postgres://user:pass@localhost:5432/mydb" --lo
 
 # Adjust the slow query threshold (default unit: milliseconds)
 iqtoolkit-analyzer analyze --dsn "postgres://user:pass@localhost:5432/mydb" --log-file /var/log/postgresql/postgresql.log --slow-threshold 500
+
+# Generate an HTML report with all settings, extensions, and version
+iqtoolkit-analyzer report --dsn "postgres://user:pass@localhost:5432/mydb" --output report.html
 ```
 
-The tool will output a report containing:
+The `analyze` command outputs:
 - Summary metrics (total entries, error count, slow queries, average duration)
 - Peak error times by hour
 - Categorized recommendations with severity levels
+
+The `report` command generates a self-contained HTML file containing:
+- PostgreSQL server version
+- All runtime settings from `pg_settings`
+- All available and installed extensions with version info
 
 ## License
 
