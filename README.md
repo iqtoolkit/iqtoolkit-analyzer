@@ -110,43 +110,189 @@ go build ./...
 
 ## Usage
 
-iqtoolkit-analyzer uses the [cobra](https://github.com/spf13/cobra) CLI framework. Connect to your PostgreSQL instance and point it at your log files to receive a health report:
+### Quick Start
 
 ```bash
-# Analyze PostgreSQL logs and configuration
-iqtoolkit-analyzer analyze --dsn "postgres://user:pass@localhost:5432/mydb" --log-file /var/log/postgresql/postgresql.log
-
-# Adjust the slow query threshold (default unit: milliseconds)
-iqtoolkit-analyzer analyze --dsn "postgres://user:pass@localhost:5432/mydb" --log-file /var/log/postgresql/postgresql.log --slow-threshold 500
-
-# Include AI-enhanced recommendations (requires API key configured)
-iqtoolkit-analyzer analyze --dsn "postgres://user:pass@localhost:5432/mydb" --log-file /var/log/postgresql/postgresql.log --ai-provider openai
-
-# Use a specific AI model
-iqtoolkit-analyzer analyze --dsn "postgres://user:pass@localhost:5432/mydb" --log-file /var/log/postgresql/postgresql.log --ai-provider anthropic --ai-model claude-sonnet-4-20250514
-
-# Output as JSON to a file
-iqtoolkit-analyzer analyze --dsn "postgres://user:pass@localhost:5432/mydb" --log-file /var/log/postgresql/postgresql.log --format json --output analysis.json
-
-# Output as Markdown
-iqtoolkit-analyzer analyze --dsn "postgres://user:pass@localhost:5432/mydb" --log-file /var/log/postgresql/postgresql.log --format markdown --output analysis.md
-
-# Generate an HTML report with all settings, extensions, and version
-iqtoolkit-analyzer report --dsn "postgres://user:pass@localhost:5432/mydb" --output report.html
+# Basic analysis — connect to PostgreSQL and analyze logs
+iqtoolkit-analyzer analyze \
+  --dsn "postgres://user:pass@localhost:5432/mydb" \
+  --log-file /var/log/postgresql/postgresql.log
 ```
 
-The `analyze` command outputs:
-- Summary metrics (total entries, error count, slow queries, average duration)
-- Peak error times by hour
-- Categorized recommendations with severity levels
-- AI-enhanced tuning recommendations (when `--ai-provider` is specified)
+### Commands
 
-Output can be formatted as plain text (default), JSON (`--format json`), or Markdown (`--format markdown`). Use `--output <file>` to write to a file instead of stdout.
+#### `analyze` — Analyze logs and configuration
 
-The `report` command generates a self-contained HTML file containing:
+```bash
+iqtoolkit-analyzer analyze [flags]
+```
+
+**Required flags:**
+
+| Flag | Description |
+|------|-------------|
+| `--dsn` | PostgreSQL connection string (`postgres://user:pass@host:port/db`) |
+| `--log-file` | Path to PostgreSQL log file |
+
+**Optional flags:**
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--slow-threshold` | `1000` | Slow query threshold in milliseconds |
+| `--log-format` | auto-detect | Log format: `stderr`, `csvlog`, or `jsonlog` |
+| `--ai-provider` | _(none)_ | AI provider: `openai`, `anthropic`, `gemini`, or `kiro` |
+| `--ai-model` | _(provider default)_ | Override the AI model (e.g., `gpt-4o`, `claude-sonnet-4-20250514`) |
+| `--format` | `text` | Output format: `text`, `json`, or `markdown` |
+| `--output` | _(stdout)_ | Write output to a file instead of stdout |
+
+**Examples:**
+
+```bash
+# Adjust the slow query threshold to 500ms
+iqtoolkit-analyzer analyze \
+  --dsn "postgres://user:pass@localhost:5432/mydb" \
+  --log-file /var/log/postgresql/postgresql.log \
+  --slow-threshold 500
+
+# Parse a CSV-formatted log file
+iqtoolkit-analyzer analyze \
+  --dsn "postgres://user:pass@localhost:5432/mydb" \
+  --log-file /var/log/postgresql/postgresql.csv \
+  --log-format csvlog
+
+# Parse a JSON-formatted log file
+iqtoolkit-analyzer analyze \
+  --dsn "postgres://user:pass@localhost:5432/mydb" \
+  --log-file /var/log/postgresql/postgresql.json \
+  --log-format jsonlog
+
+# Include AI-enhanced recommendations (requires API key configured)
+iqtoolkit-analyzer analyze \
+  --dsn "postgres://user:pass@localhost:5432/mydb" \
+  --log-file /var/log/postgresql/postgresql.log \
+  --ai-provider openai
+
+# Use a specific AI model
+iqtoolkit-analyzer analyze \
+  --dsn "postgres://user:pass@localhost:5432/mydb" \
+  --log-file /var/log/postgresql/postgresql.log \
+  --ai-provider anthropic --ai-model claude-sonnet-4-20250514
+
+# Output as JSON to a file
+iqtoolkit-analyzer analyze \
+  --dsn "postgres://user:pass@localhost:5432/mydb" \
+  --log-file /var/log/postgresql/postgresql.log \
+  --format json --output analysis.json
+
+# Output as Markdown
+iqtoolkit-analyzer analyze \
+  --dsn "postgres://user:pass@localhost:5432/mydb" \
+  --log-file /var/log/postgresql/postgresql.log \
+  --format markdown --output analysis.md
+```
+
+**Sample output (text):**
+
+```
+=== Summary ===
+Total entries:    14832
+Error count:      47
+Slow queries:     12
+Avg duration:     45.2ms
+Peak error time:  2024-03-15 14:00:00 +0000 UTC
+
+=== Recommendations ===
+[critical][performance] Average query duration (45.2ms) exceeds threshold
+[warning][performance] 12 slow queries detected (threshold: 1000ms)
+[warning][reliability] 47 errors detected in log file
+[info][configuration] shared_buffers is set to default value; consider increasing
+
+=== AI-Enhanced Recommendations ===
+Based on your metrics, here are prioritized tuning suggestions:
+1. Increase shared_buffers from 128MB to at least 1GB (25% of RAM)...
+```
+
+**Sample output (JSON):**
+
+```json
+{
+  "summary": {
+    "total_entries": 14832,
+    "error_count": 47,
+    "slow_queries": 12,
+    "avg_duration": "45.2ms",
+    "peak_error_time": "2024-03-15T14:00:00Z"
+  },
+  "recommendations": [
+    {
+      "severity": "critical",
+      "category": "performance",
+      "message": "Average query duration (45.2ms) exceeds threshold"
+    }
+  ],
+  "ai_recommendations": "..."
+}
+```
+
+#### `report` — Generate an HTML report
+
+```bash
+iqtoolkit-analyzer report [flags]
+```
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--dsn` | _(required)_ | PostgreSQL connection string |
+| `--output` | `report.html` | Output HTML file path |
+
+```bash
+iqtoolkit-analyzer report \
+  --dsn "postgres://user:pass@localhost:5432/mydb" \
+  --output report.html
+```
+
+The HTML report contains:
 - PostgreSQL server version
 - All runtime settings from `pg_settings`
 - All available and installed extensions with version info
+
+#### Global Flags
+
+```bash
+# Show version
+iqtoolkit-analyzer --version
+
+# Show help
+iqtoolkit-analyzer --help
+iqtoolkit-analyzer analyze --help
+```
+
+### Log Format Support
+
+iqtoolkit-analyzer auto-detects the log format. You can override detection with `--log-format`:
+
+| Format | PostgreSQL Setting | Description |
+|--------|-------------------|-------------|
+| `stderr` | `log_destination = 'stderr'` | Default line-based format |
+| `csvlog` | `log_destination = 'csvlog'` | Comma-separated values |
+| `jsonlog` | `log_destination = 'jsonlog'` | JSON (one object per line, PG 15+) |
+
+### Extension Requirements
+
+For full data collection, iqtoolkit-analyzer uses these PostgreSQL extensions:
+
+| Extension | Purpose | Required? |
+|-----------|---------|-----------|
+| `pg_stat_statements` | Top queries by execution time | Recommended |
+| `pg_buffercache` | Buffer cache usage analysis | Optional |
+
+If an extension is available but not installed, the tool will prompt:
+
+```
+Extension "pg_stat_statements" is available but not installed. Run: CREATE EXTENSION pg_stat_statements;
+```
+
+If unavailable, the tool continues without that data source — no failure.
 
 ## License
 
