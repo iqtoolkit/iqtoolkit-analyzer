@@ -48,8 +48,9 @@ type Response struct {
 type Client struct {
 	Provider   Provider
 	APIKey     string
-	Region     string // AWS region for Kiro/Bedrock
-	MaxRetries int    // retry attempts on transient errors (default: 3)
+	Region     string        // AWS region for Kiro/Bedrock
+	MaxRetries int           // retry attempts on transient errors (default: 3)
+	Timeout    time.Duration // per-request timeout (default: 60s)
 	HTTPClient *http.Client
 }
 
@@ -63,7 +64,9 @@ func (c *Client) Complete(ctx context.Context, req Request) (*Response, error) {
 	var resp *Response
 	var err error
 	for attempt := range c.maxRetries() {
-		resp, err = c.dispatch(ctx, req)
+		reqCtx, cancel := context.WithTimeout(ctx, c.timeout())
+		resp, err = c.dispatch(reqCtx, req)
+		cancel()
 		if err == nil {
 			return resp, nil
 		}
@@ -85,6 +88,13 @@ func (c *Client) maxRetries() int {
 		return c.MaxRetries
 	}
 	return 3
+}
+
+func (c *Client) timeout() time.Duration {
+	if c.Timeout > 0 {
+		return c.Timeout
+	}
+	return 60 * time.Second
 }
 
 func isRetryable(err error) bool {
