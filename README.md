@@ -117,6 +117,9 @@ go build ./...
 iqtoolkit-analyzer analyze \
   --dsn "postgres://user:pass@localhost:5432/mydb" \
   --log-file /var/log/postgresql/postgresql.log
+
+# Log-only mode — analyze a log file without a database connection
+iqtoolkit-analyzer analyze --log-file /var/log/postgresql/postgresql.log
 ```
 
 ### Commands
@@ -131,17 +134,17 @@ iqtoolkit-analyzer analyze [flags]
 
 | Flag | Description |
 |------|-------------|
-| `--dsn` | PostgreSQL connection string (`postgres://user:pass@host:port/db`) |
 | `--log-file` | Path to PostgreSQL log file |
 
 **Optional flags:**
 
 | Flag | Default | Description |
 |------|---------|-------------|
+| `--dsn` | _(none)_ | PostgreSQL connection string (`postgres://user:pass@host:port/db`). Omit to run in **log-only mode** — settings and runtime stats are skipped |
 | `--slow-threshold` | `1000` | Slow query threshold in milliseconds |
 | `--log-format` | auto-detect | Log format: `stderr`, `csvlog`, or `jsonlog` |
 | `--ai-provider` | _(none)_ | AI provider: `openai`, `anthropic`, `gemini`, or `kiro` |
-| `--ai-model` | _(provider default)_ | Override the AI model (e.g., `gpt-4o`, `claude-sonnet-4-20250514`) |
+| `--ai-model` | _(provider default)_ | Override the AI model (e.g., `gpt-4o`, `claude-sonnet-4-5`). Can also be set via `IQTOOLKIT_AI_MODEL` env var |
 | `--format` | `text` | Output format: `text`, `json`, or `markdown` |
 | `--output` | _(stdout)_ | Write output to a file instead of stdout |
 
