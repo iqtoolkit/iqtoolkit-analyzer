@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"sort"
 	"time"
 
+	"github.com/iqtoolkit/iqtoolkit-analyzer/internal/logparser"
 	"github.com/iqtoolkit/iqtoolkit-analyzer/internal/metrics"
 	"github.com/iqtoolkit/iqtoolkit-analyzer/internal/recommendations"
 )
@@ -34,10 +36,30 @@ type jsonRecommendation struct {
 	Message  string `json:"message"`
 }
 
+type jsonSlowQuery struct {
+	Timestamp string `json:"timestamp"`
+	Duration  string `json:"duration"`
+	Query     string `json:"query"`
+}
+
 type jsonReport struct {
 	Summary           jsonSummary          `json:"summary"`
+	SlowQueries       []jsonSlowQuery      `json:"slow_queries,omitempty"`
 	Recommendations   []jsonRecommendation `json:"recommendations"`
 	AIRecommendations string               `json:"ai_recommendations,omitempty"`
+}
+
+// maxSlowQueries limits how many slow queries are rendered in reports.
+const maxSlowQueries = 10
+
+func topSlowQueries(report *metrics.Report) []logparser.Entry {
+	qs := make([]logparser.Entry, len(report.SlowQueries))
+	copy(qs, report.SlowQueries)
+	sort.Slice(qs, func(i, j int) bool { return qs[i].Duration > qs[j].Duration })
+	if len(qs) > maxSlowQueries {
+		qs = qs[:maxSlowQueries]
+	}
+	return qs
 }
 
 // Write renders the report, recommendations, and optional AI content to w in
@@ -66,6 +88,13 @@ func writeJSON(w io.Writer, report *metrics.Report, recs []recommendations.Recom
 	if !report.PeakErrorTime.IsZero() {
 		out.Summary.PeakErrorTime = report.PeakErrorTime.Format(time.RFC3339)
 	}
+	for _, q := range topSlowQueries(report) {
+		out.SlowQueries = append(out.SlowQueries, jsonSlowQuery{
+			Timestamp: q.Timestamp.Format(time.RFC3339),
+			Duration:  q.Duration.String(),
+			Query:     q.Message,
+		})
+	}
 	for _, r := range recs {
 		out.Recommendations = append(out.Recommendations, jsonRecommendation{r.Severity, r.Category, r.Message})
 	}
@@ -84,6 +113,13 @@ func writeMarkdown(w io.Writer, report *metrics.Report, recs []recommendations.R
 	fmt.Fprintf(w, "| Avg duration | %v |\n", report.AvgDuration)
 	if !report.PeakErrorTime.IsZero() {
 		fmt.Fprintf(w, "| Peak error time | %v |\n", report.PeakErrorTime)
+	}
+	if qs := topSlowQueries(report); len(qs) > 0 {
+		fmt.Fprintf(w, "\n## Slowest Queries (top %d)\n\n", len(qs))
+		fmt.Fprintf(w, "| Time | Duration | Query |\n|------|----------|-------|\n")
+		for _, q := range qs {
+			fmt.Fprintf(w, "| %s | %v | `%s` |\n", q.Timestamp.Format("2006-01-02 15:04:05"), q.Duration, q.Message)
+		}
 	}
 	if len(recs) > 0 {
 		fmt.Fprintf(w, "\n## Recommendations\n\n")
@@ -105,6 +141,12 @@ func writeText(w io.Writer, report *metrics.Report, recs []recommendations.Recom
 	fmt.Fprintf(w, "Avg duration:     %v\n", report.AvgDuration)
 	if !report.PeakErrorTime.IsZero() {
 		fmt.Fprintf(w, "Peak error time:  %v\n", report.PeakErrorTime)
+	}
+	if qs := topSlowQueries(report); len(qs) > 0 {
+		fmt.Fprintf(w, "\n=== Slowest Queries (top %d) ===\n", len(qs))
+		for _, q := range qs {
+			fmt.Fprintf(w, "[%s] %v  %s\n", q.Timestamp.Format("2006-01-02 15:04:05"), q.Duration, q.Message)
+		}
 	}
 	if len(recs) > 0 {
 		fmt.Fprintf(w, "\n=== Recommendations ===\n")

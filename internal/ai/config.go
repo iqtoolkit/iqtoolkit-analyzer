@@ -2,6 +2,7 @@ package ai
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -36,6 +37,13 @@ func LoadConfig() (*Config, error) {
 		return cfg, nil // file missing is not an error
 	}
 	defer f.Close()
+
+	// Warn if the config file (which may contain API keys) is readable by others.
+	if fi, err := f.Stat(); err == nil {
+		if fi.Mode().Perm()&0o044 != 0 {
+			fmt.Fprintf(os.Stderr, "Warning: %s is readable by other users (mode %o). Run: chmod 600 %s\n", path, fi.Mode().Perm(), path)
+		}
+	}
 
 	var fileCfg Config
 	if err := json.NewDecoder(f).Decode(&fileCfg); err != nil {

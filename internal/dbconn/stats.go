@@ -14,6 +14,8 @@ type ExtensionStatus struct {
 
 // CheckExtension checks if a given extension is installed or available.
 func (c *Conn) CheckExtension(ctx context.Context, name string) (*ExtensionStatus, error) {
+	ctx, cancel := c.queryCtx(ctx)
+	defer cancel()
 	s := &ExtensionStatus{Name: name}
 	var count int
 	err := c.conn.QueryRow(ctx, "SELECT count(*) FROM pg_extension WHERE extname = $1", name).Scan(&count)
@@ -48,6 +50,8 @@ type StatStatement struct {
 
 // StatStatements queries pg_stat_statements for the top queries by total time.
 func (c *Conn) StatStatements(ctx context.Context, limit int) ([]StatStatement, error) {
+	ctx, cancel := c.queryCtx(ctx)
+	defer cancel()
 	q := fmt.Sprintf(`SELECT query, calls, total_exec_time, mean_exec_time, rows, shared_blks_hit, shared_blks_read
 		FROM pg_stat_statements ORDER BY total_exec_time DESC LIMIT %d`, limit)
 	rows, err := c.conn.Query(ctx, q)
@@ -83,7 +87,9 @@ type TableStat struct {
 
 // StatUserTables queries pg_stat_user_tables.
 func (c *Conn) StatUserTables(ctx context.Context) ([]TableStat, error) {
-	rows, err := c.conn.Query(ctx, `SELECT schemaname, relname, seq_scan, seq_tup_read, 
+	ctx, cancel := c.queryCtx(ctx)
+	defer cancel()
+	rows, err := c.conn.Query(ctx, `SELECT schemaname, relname, seq_scan, seq_tup_read,
 		COALESCE(idx_scan, 0), COALESCE(idx_tup_fetch, 0), n_tup_ins, n_tup_upd, n_tup_del, n_dead_tup, n_live_tup
 		FROM pg_stat_user_tables ORDER BY seq_scan DESC`)
 	if err != nil {
@@ -114,6 +120,8 @@ type IndexStat struct {
 
 // StatUserIndexes queries pg_stat_user_indexes for unused/underused indexes.
 func (c *Conn) StatUserIndexes(ctx context.Context) ([]IndexStat, error) {
+	ctx, cancel := c.queryCtx(ctx)
+	defer cancel()
 	rows, err := c.conn.Query(ctx, `SELECT schemaname, relname, indexrelname, idx_scan, idx_tup_read, idx_tup_fetch
 		FROM pg_stat_user_indexes ORDER BY idx_scan ASC`)
 	if err != nil {
@@ -141,6 +149,8 @@ type BufferCacheStat struct {
 
 // StatBufferCache queries pg_buffercache for buffer usage by table (requires pg_buffercache extension).
 func (c *Conn) StatBufferCache(ctx context.Context, limit int) ([]BufferCacheStat, error) {
+	ctx, cancel := c.queryCtx(ctx)
+	defer cancel()
 	q := fmt.Sprintf(`SELECT n.nspname, c.relname, count(*) AS buffers,
 		count(*) * current_setting('block_size')::bigint / (1024*1024.0) AS size_mb
 		FROM pg_buffercache b

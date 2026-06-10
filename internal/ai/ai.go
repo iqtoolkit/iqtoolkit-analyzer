@@ -5,10 +5,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"os"
+	"syscall"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -55,9 +58,28 @@ type Message struct {
 
 // Request holds parameters for a completion call.
 type Request struct {
-	Model    string
-	Messages []Message
-	System   string // system prompt (used directly by Anthropic, prepended as message for OpenAI)
+	Model     string
+	Messages  []Message
+	System    string // system prompt (used directly by Anthropic, prepended as message for OpenAI)
+	MaxTokens int    // maximum output tokens (default: 4096)
+}
+
+func (r Request) maxTokens() int {
+	if r.MaxTokens > 0 {
+		return r.MaxTokens
+	}
+	return 4096
+}
+
+// HTTPError is returned when a provider responds with a non-200 status.
+type HTTPError struct {
+	Provider   Provider
+	StatusCode int
+	Body       string
+}
+
+func (e *HTTPError) Error() string {
+	return fmt.Sprintf("ai: %s returned %d: %s", e.Provider, e.StatusCode, e.Body)
 }
 
 // Response holds the result of a completion call.
@@ -119,23 +141,21 @@ func (c *Client) timeout() time.Duration {
 }
 
 func isRetryable(err error) bool {
-	s := err.Error()
-	// Retry on rate limits (429), server errors (5xx), and generic network errors
-	return contains(s, "429") || contains(s, "500") || contains(s, "502") ||
-		contains(s, "503") || contains(s, "504") ||
-		contains(s, "connection refused") || contains(s, "timeout") ||
-		contains(s, "EOF")
-}
-
-func contains(s, substr string) bool {
-	return len(s) >= len(substr) && (s == substr || len(s) > 0 && stringContains(s, substr))
-}
-
-func stringContains(s, sub string) bool {
-	for i := 0; i <= len(s)-len(sub); i++ {
-		if s[i:i+len(sub)] == sub {
-			return true
-		}
+	// HTTP-level errors: retry on rate limits (429) and server errors (5xx).
+	var he *HTTPError
+	if errors.As(err, &he) {
+		return he.StatusCode == http.StatusTooManyRequests || he.StatusCode >= 500
+	}
+	// Network-level errors: timeouts and dropped connections.
+	var ne net.Error
+	if errors.As(err, &ne) && ne.Timeout() {
+		return true
+	}
+	if errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF) || errors.Is(err, syscall.ECONNREFUSED) || errors.Is(err, syscall.ECONNRESET) {
+		return true
+	}
+	if errors.Is(err, context.DeadlineExceeded) {
+		return true
 	}
 	return false
 }
@@ -163,8 +183,9 @@ func (c *Client) completeOpenAI(ctx context.Context, req Request) (*Response, er
 		msgs = append([]Message{{Role: "system", Content: req.System}}, msgs...)
 	}
 	body, _ := json.Marshal(map[string]any{
-		"model":    req.Model,
-		"messages": msgs,
+		"model":      req.Model,
+		"messages":   msgs,
+		"max_tokens": req.maxTokens(),
 	})
 	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://api.openai.com/v1/chat/completions", bytes.NewReader(body))
 	if err != nil {
@@ -181,7 +202,7 @@ func (c *Client) completeOpenAI(ctx context.Context, req Request) (*Response, er
 
 	if resp.StatusCode != http.StatusOK {
 		b, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("ai: openai returned %d: %s", resp.StatusCode, b)
+		return nil, &HTTPError{Provider: OpenAI, StatusCode: resp.StatusCode, Body: string(b)}
 	}
 
 	var result struct {
@@ -205,7 +226,7 @@ func (c *Client) completeOpenAI(ctx context.Context, req Request) (*Response, er
 func (c *Client) completeAnthropic(ctx context.Context, req Request) (*Response, error) {
 	payload := map[string]any{
 		"model":      req.Model,
-		"max_tokens": 4096,
+		"max_tokens": req.maxTokens(),
 		"messages":   req.Messages,
 	}
 	if req.System != "" {
@@ -228,7 +249,7 @@ func (c *Client) completeAnthropic(ctx context.Context, req Request) (*Response,
 
 	if resp.StatusCode != http.StatusOK {
 		b, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("ai: anthropic returned %d: %s", resp.StatusCode, b)
+		return nil, &HTTPError{Provider: Anthropic, StatusCode: resp.StatusCode, Body: string(b)}
 	}
 
 	var result struct {
@@ -259,7 +280,10 @@ func (c *Client) completeGemini(ctx context.Context, req Request) (*Response, er
 			"parts": []map[string]string{{"text": m.Content}},
 		})
 	}
-	payload := map[string]any{"contents": contents}
+	payload := map[string]any{
+		"contents":         contents,
+		"generationConfig": map[string]any{"maxOutputTokens": req.maxTokens()},
+	}
 	if req.System != "" {
 		payload["systemInstruction"] = map[string]any{
 			"parts": []map[string]string{{"text": req.System}},
@@ -281,7 +305,7 @@ func (c *Client) completeGemini(ctx context.Context, req Request) (*Response, er
 
 	if resp.StatusCode != http.StatusOK {
 		b, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("ai: gemini returned %d: %s", resp.StatusCode, b)
+		return nil, &HTTPError{Provider: Gemini, StatusCode: resp.StatusCode, Body: string(b)}
 	}
 
 	var result struct {
@@ -327,9 +351,11 @@ func (c *Client) completeKiro(ctx context.Context, req Request) (*Response, erro
 		})
 	}
 
+	maxTokens := int32(req.maxTokens())
 	input := &bedrockruntime.ConverseInput{
-		ModelId:  aws.String(req.Model),
-		Messages: msgs,
+		ModelId:         aws.String(req.Model),
+		Messages:        msgs,
+		InferenceConfig: &types.InferenceConfiguration{MaxTokens: &maxTokens},
 	}
 	if req.System != "" {
 		input.System = []types.SystemContentBlock{&types.SystemContentBlockMemberText{Value: req.System}}

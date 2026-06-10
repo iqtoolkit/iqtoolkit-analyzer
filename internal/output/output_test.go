@@ -3,10 +3,12 @@ package output
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/iqtoolkit/iqtoolkit-analyzer/internal/logparser"
 	"github.com/iqtoolkit/iqtoolkit-analyzer/internal/metrics"
 	"github.com/iqtoolkit/iqtoolkit-analyzer/internal/recommendations"
 )
@@ -128,6 +130,55 @@ func TestWriteTextNoRecommendations(t *testing.T) {
 	}
 	if !strings.Contains(buf.String(), "No recommendations") {
 		t.Error("expected 'No recommendations' message")
+	}
+}
+
+func TestSlowQueriesRendered(t *testing.T) {
+	rep := sampleReport()
+	rep.SlowQueries = []logparser.Entry{
+		{Timestamp: time.Date(2026, 6, 1, 10, 0, 0, 0, time.UTC), Message: "SELECT slow", Duration: 3 * time.Second},
+		{Timestamp: time.Date(2026, 6, 1, 11, 0, 0, 0, time.UTC), Message: "SELECT slower", Duration: 9 * time.Second},
+	}
+
+	var text, md, js bytes.Buffer
+	for _, c := range []struct {
+		f Format
+		w *bytes.Buffer
+	}{{Text, &text}, {Markdown, &md}, {JSON, &js}} {
+		if err := Write(c.w, c.f, rep, nil, ""); err != nil {
+			t.Fatal(err)
+		}
+		if !strings.Contains(c.w.String(), "SELECT slower") {
+			t.Errorf("%s output missing slow query", c.f)
+		}
+	}
+	// Slowest first
+	if i, j := strings.Index(text.String(), "SELECT slower"), strings.Index(text.String(), "SELECT slow\n"); i > j {
+		t.Error("slow queries not sorted by duration desc")
+	}
+}
+
+func TestSlowQueriesCappedAtTen(t *testing.T) {
+	rep := sampleReport()
+	for i := 0; i < 15; i++ {
+		rep.SlowQueries = append(rep.SlowQueries, logparser.Entry{
+			Timestamp: time.Now(),
+			Message:   fmt.Sprintf("Q%d", i),
+			Duration:  time.Duration(i+1) * time.Second,
+		})
+	}
+	var buf bytes.Buffer
+	if err := Write(&buf, JSON, rep, nil, ""); err != nil {
+		t.Fatal(err)
+	}
+	var out struct {
+		SlowQueries []any `json:"slow_queries"`
+	}
+	if err := json.Unmarshal(buf.Bytes(), &out); err != nil {
+		t.Fatal(err)
+	}
+	if len(out.SlowQueries) != 10 {
+		t.Errorf("got %d slow queries, want 10", len(out.SlowQueries))
 	}
 }
 

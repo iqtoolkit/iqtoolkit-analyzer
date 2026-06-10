@@ -81,6 +81,13 @@ func newAnalyzeCmd() *cobra.Command {
 	var aiProvider, aiModel string
 	var outputFile, outputFormat string
 	var logFormat string
+	var quiet bool
+
+	notice := func(format string, a ...any) {
+		if !quiet {
+			fmt.Fprintf(os.Stderr, format, a...)
+		}
+	}
 
 	analyze := &cobra.Command{
 		Use:   "analyze",
@@ -120,19 +127,19 @@ func newAnalyzeCmd() *cobra.Command {
 				for _, ext := range dbconn.RequiredExtensions {
 					status, err := conn.CheckExtension(ctx, ext)
 					if err != nil {
-						fmt.Fprintf(os.Stderr, "Warning: could not check extension %s: %v\n", ext, err)
+						notice("Warning: could not check extension %s: %v\n", ext, err)
 						continue
 					}
 					if !status.Installed {
 						if status.Available {
-							fmt.Fprintf(os.Stderr, "Extension %q is available but not installed. Run: CREATE EXTENSION %s;\n", ext, ext)
+							notice("Extension %q is available but not installed. Run: CREATE EXTENSION %s;\n", ext, ext)
 						} else {
-							fmt.Fprintf(os.Stderr, "Extension %q is not available on this server.\n", ext)
+							notice("Extension %q is not available on this server.\n", ext)
 						}
 					}
 				}
 			} else {
-				fmt.Fprintln(os.Stderr, "No --dsn provided: running in log-only mode (settings and runtime stats skipped)")
+				notice("No --dsn provided: running in log-only mode (settings and runtime stats skipped)\n")
 			}
 
 			// Analyze metrics
@@ -200,7 +207,7 @@ func newAnalyzeCmd() *cobra.Command {
 			}
 
 			if outputFile != "" {
-				fmt.Fprintf(os.Stderr, "Report written to %s\n", outputFile)
+				notice("Report written to %s\n", outputFile)
 			}
 
 			return nil
@@ -215,6 +222,7 @@ func newAnalyzeCmd() *cobra.Command {
 	analyze.Flags().StringVar(&aiModel, "ai-model", "", "AI model override (default: provider-specific)")
 	analyze.Flags().StringVar(&outputFile, "output", "", "Write output to file instead of stdout")
 	analyze.Flags().StringVar(&outputFormat, "format", "text", "Output format: text, json, or markdown")
+	analyze.Flags().BoolVarP(&quiet, "quiet", "q", false, "Suppress informational messages on stderr")
 	cobra.CheckErr(analyze.MarkFlagRequired("log-file"))
 
 	return analyze
@@ -251,11 +259,15 @@ func newReportCmd() *cobra.Command {
 				return fmt.Errorf("creating output file: %w", err)
 			}
 
+			// Settings-based recommendations (no log entries in report mode).
+			recs := recommendations.Generate(metrics.Analyze(nil, settings, 0))
+
 			if err := report.Generate(f, report.Data{
-				Version:     version,
-				Settings:    settings,
-				Extensions:  extensions,
-				GeneratedAt: time.Now(),
+				Version:         version,
+				Settings:        settings,
+				Extensions:      extensions,
+				Recommendations: recs,
+				GeneratedAt:     time.Now(),
 			}); err != nil {
 				f.Close()
 				return fmt.Errorf("generating report: %w", err)

@@ -4,9 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"syscall"
 	"testing"
 	"time"
 
@@ -34,19 +37,26 @@ func TestDefaultModelEnvOverride(t *testing.T) {
 
 func TestIsRetryable(t *testing.T) {
 	cases := []struct {
-		err  string
+		name string
+		err  error
 		want bool
 	}{
-		{"ai: openai returned 429: rate limited", true},
-		{"ai: anthropic returned 503: overloaded", true},
-		{"connection refused", true},
-		{"unexpected EOF", true},
-		{"ai: openai returned 401: bad key", false},
-		{"ai: unsupported provider", false},
+		{"429", &HTTPError{Provider: OpenAI, StatusCode: 429}, true},
+		{"503", &HTTPError{Provider: Anthropic, StatusCode: 503}, true},
+		{"500", &HTTPError{Provider: Gemini, StatusCode: 500}, true},
+		{"401", &HTTPError{Provider: OpenAI, StatusCode: 401}, false},
+		{"404", &HTTPError{Provider: OpenAI, StatusCode: 404}, false},
+		{"connection refused", syscall.ECONNREFUSED, true},
+		{"connection reset", syscall.ECONNRESET, true},
+		{"unexpected EOF", io.ErrUnexpectedEOF, true},
+		{"deadline exceeded", context.DeadlineExceeded, true},
+		{"wrapped 429", fmt.Errorf("call failed: %w", &HTTPError{Provider: OpenAI, StatusCode: 429}), true},
+		{"plain error mentioning 429", errors.New("query returned 429 rows"), false},
+		{"unsupported provider", errors.New("ai: unsupported provider"), false},
 	}
 	for _, c := range cases {
-		if got := isRetryable(errors.New(c.err)); got != c.want {
-			t.Errorf("isRetryable(%q) = %v, want %v", c.err, got, c.want)
+		if got := isRetryable(c.err); got != c.want {
+			t.Errorf("%s: isRetryable = %v, want %v", c.name, got, c.want)
 		}
 	}
 }

@@ -96,16 +96,26 @@ iqtoolkit-analyzer/
 
 ## Installation
 
+**Pre-built binaries** (Linux, macOS, Windows — amd64/arm64) are available on the [releases page](https://github.com/iqtoolkit/iqtoolkit-analyzer/releases):
+
+```bash
+# Example: macOS arm64
+curl -sL https://github.com/iqtoolkit/iqtoolkit-analyzer/releases/latest/download/iqtoolkit-analyzer_Darwin_arm64.tar.gz | tar xz
+sudo mv iqtoolkit-analyzer /usr/local/bin/
+```
+
+**With Go:**
+
 ```bash
 go install github.com/iqtoolkit/iqtoolkit-analyzer@latest
 ```
 
-Or build from source:
+**From source:**
 
 ```bash
 git clone https://github.com/iqtoolkit/iqtoolkit-analyzer.git
 cd iqtoolkit-analyzer
-go build ./...
+make build
 ```
 
 ## Usage

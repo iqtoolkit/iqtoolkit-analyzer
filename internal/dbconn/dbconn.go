@@ -9,6 +9,16 @@ import (
 
 type Conn struct {
 	conn *pgx.Conn
+	// QueryTimeout bounds each individual query (default: 30s).
+	QueryTimeout time.Duration
+}
+
+func (c *Conn) queryCtx(ctx context.Context) (context.Context, context.CancelFunc) {
+	t := c.QueryTimeout
+	if t <= 0 {
+		t = 30 * time.Second
+	}
+	return context.WithTimeout(ctx, t)
 }
 
 type Setting struct {
@@ -36,13 +46,17 @@ type Extension struct {
 func (c *Conn) Close(ctx context.Context) error { return c.conn.Close(ctx) }
 
 func (c *Conn) Version(ctx context.Context) (string, error) {
+	ctx, cancel := c.queryCtx(ctx)
+	defer cancel()
 	var v string
 	err := c.conn.QueryRow(ctx, "SELECT version()").Scan(&v)
 	return v, err
 }
 
 func (c *Conn) Extensions(ctx context.Context) ([]Extension, error) {
-	rows, err := c.conn.Query(ctx, `SELECT a.name, a.default_version, COALESCE(i.extversion, '') 
+	ctx, cancel := c.queryCtx(ctx)
+	defer cancel()
+	rows, err := c.conn.Query(ctx, `SELECT a.name, a.default_version, COALESCE(i.extversion, '')
 		FROM pg_available_extensions a LEFT JOIN pg_extension i ON a.name = i.extname ORDER BY a.name`)
 	if err != nil {
 		return nil, err
@@ -60,6 +74,8 @@ func (c *Conn) Extensions(ctx context.Context) ([]Extension, error) {
 }
 
 func (c *Conn) Settings(ctx context.Context) ([]Setting, error) {
+	ctx, cancel := c.queryCtx(ctx)
+	defer cancel()
 	rows, err := c.conn.Query(ctx, "SELECT name, setting, source FROM pg_settings")
 	if err != nil {
 		return nil, err

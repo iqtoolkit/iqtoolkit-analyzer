@@ -6,13 +6,15 @@ import (
 	"time"
 
 	"github.com/iqtoolkit/iqtoolkit-analyzer/internal/dbconn"
+	"github.com/iqtoolkit/iqtoolkit-analyzer/internal/recommendations"
 )
 
 type Data struct {
-	Version     string
-	Settings    []dbconn.Setting
-	Extensions  []dbconn.Extension
-	GeneratedAt time.Time
+	Version         string
+	Settings        []dbconn.Setting
+	Extensions      []dbconn.Extension
+	Recommendations []recommendations.Recommendation
+	GeneratedAt     time.Time
 }
 
 var tmpl = template.Must(template.New("report").Parse(`<!DOCTYPE html>
@@ -40,6 +42,10 @@ td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #f1f5f9; color: #475569; }
 tr:hover td { background: #f8fafc; }
 .installed { color: #059669; font-weight: 600; }
 .not-installed { color: #94a3b8; }
+.sev { font-weight: 600; text-transform: uppercase; font-size: 0.7rem; padding: 0.1rem 0.4rem; border-radius: 4px; }
+.sev-critical { background: #fee2e2; color: #b91c1c; }
+.sev-warning { background: #fef3c7; color: #b45309; }
+.sev-info { background: #e0f2fe; color: #0369a1; }
 footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; text-align: center; color: #64748b; font-size: 0.8rem; }
 footer a { color: #059669; text-decoration: none; }
 @media print {
@@ -79,6 +85,12 @@ footer a { color: #059669; text-decoration: none; }
 <h2>PostgreSQL Version</h2>
 <div class="version-box">{{.Version}}</div>
 
+{{if .Recommendations}}<h2>Recommendations</h2>
+<table>
+<tr><th>Severity</th><th>Category</th><th>Recommendation</th></tr>
+{{range .Recommendations}}<tr><td><span class="sev sev-{{.Severity}}">{{.Severity}}</span></td><td>{{.Category}}</td><td>{{.Message}}</td></tr>
+{{end}}</table>
+{{end}}
 <h2>Settings (pg_settings)</h2>
 <table>
 <tr><th>Name</th><th>Value</th><th>Source</th></tr>
