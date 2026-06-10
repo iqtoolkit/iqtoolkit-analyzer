@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -25,6 +26,26 @@ const (
 	Gemini    Provider = "gemini"
 	Kiro      Provider = "kiro" // Amazon Bedrock
 )
+
+// DefaultModel returns the default model for a provider. The
+// IQTOOLKIT_AI_MODEL environment variable overrides all provider defaults.
+func DefaultModel(p Provider) string {
+	if m := os.Getenv("IQTOOLKIT_AI_MODEL"); m != "" {
+		return m
+	}
+	switch p {
+	case OpenAI:
+		return "gpt-4o"
+	case Anthropic:
+		return "claude-sonnet-4-5"
+	case Gemini:
+		return "gemini-2.5-pro"
+	case Kiro:
+		return "anthropic.claude-sonnet-4-5-v1:0"
+	default:
+		return ""
+	}
+}
 
 // Message represents a single chat message.
 type Message struct {
