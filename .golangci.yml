@@ -16,3 +16,5 @@ linters:
         - fmt.Fprintf
         - fmt.Fprintln
         - (io.Closer).Close
+        - (*os.File).Close
+        - (*github.com/iqtoolkit/iqtoolkit-analyzer/internal/dbconn.Conn).Close

@@ -66,7 +66,7 @@ func Generate(report *metrics.Report) []Recommendation {
 				recs = append(recs, Recommendation{
 					Severity: "critical",
 					Category: "maintenance",
-					Message:  "autovacuum is disabled. Tables will accumulate dead tuples and bloat. Enable it unless you run manual vacuums.",
+					Message:  "autovacuum is DISABLED. This is never acceptable: dead tuples will accumulate, tables will bloat, and the database is at risk of transaction ID wraparound shutdown. Re-enable autovacuum immediately.",
 				})
 			}
 		case "effective_cache_size":
