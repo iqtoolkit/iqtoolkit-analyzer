@@ -1,12 +1,14 @@
 /**
- * UNFIXED (buggy) implementation of getTargetFromProxyTable.
+ * Fixed implementation of getTargetFromProxyTable.
  *
- * This function uses unanchored substring matching (indexOf) to determine
- * route matches from a proxy table. This allows crafted Host headers that
- * contain a router key as a substring to bypass routing boundaries.
+ * Replaces the single unanchored indexOf check with a three-branch key
+ * classifier that enforces exact host matching, preventing crafted Host
+ * headers from bypassing routing boundaries via substring injection.
  *
- * Bug: hostAndPath.indexOf(key) > -1 performs unanchored search,
- * so "evillocalhost:3000/api".indexOf("localhost:3000/api") matches.
+ * Key classification:
+ * - Path-only keys (start with "/"): preserve existing indexOf behavior
+ * - Host+path keys (contain "/" but don't start with "/"): exact host + path prefix
+ * - Host-only keys (no "/"): exact host equality
  */
 
 export interface ProxyRequest {
@@ -20,18 +22,41 @@ export type ProxyTable = Record<string, string>;
  * Returns the target backend URL for the first matching proxy-table key,
  * or undefined if no key matches.
  *
- * KNOWN BUG: Uses indexOf (unanchored substring match) which allows
- * Host header spoofing via superstring injection.
+ * Uses a three-branch classifier to match keys:
+ * 1. Path-only keys (starts with "/"): indexOf on (host + path)
+ * 2. Host+path keys (contains "/" but doesn't start with "/"): exact host === keyHost AND path.startsWith(keyPath)
+ * 3. Host-only keys (no "/"): exact host === key
+ *
+ * Iteration order is preserved (first match wins).
  */
 export function getTargetFromProxyTable(
   req: ProxyRequest,
   table: ProxyTable
 ): string | undefined {
-  const hostAndPath = (req.headers.host || '') + req.url;
+  const host = req.headers.host || '';
+  const path = req.url;
 
   for (const key of Object.keys(table)) {
-    if (hostAndPath.indexOf(key) > -1) {
-      return table[key];
+    if (key.startsWith('/')) {
+      // Path-only key: preserve existing indexOf behavior
+      const hostAndPath = host + path;
+      if (hostAndPath.indexOf(key) > -1) {
+        return table[key];
+      }
+    } else if (key.indexOf('/') > -1) {
+      // Host+path key: exact host match + path prefix check
+      const slashIndex = key.indexOf('/');
+      const keyHost = key.substring(0, slashIndex);
+      const keyPath = key.substring(slashIndex); // includes leading "/"
+
+      if (host === keyHost && path.startsWith(keyPath)) {
+        return table[key];
+      }
+    } else {
+      // Host-only key: exact host equality
+      if (host === key) {
+        return table[key];
+      }
     }
   }
 
