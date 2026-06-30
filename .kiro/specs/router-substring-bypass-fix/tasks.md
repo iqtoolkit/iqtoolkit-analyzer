@@ -69,7 +69,7 @@ Fix the substring bypass vulnerability in `getTargetFromProxyTable()` in `src/ro
     - **EXPECTED OUTCOME**: Test PASSES (confirms bug is fixed — crafted Host headers no longer bypass routing)
     - _Requirements: 2.1, 2.2, 2.3_
 
-  - [ ] 3.3 Verify preservation tests still pass
+  - [x] 3.3 Verify preservation tests still pass
     - **Property 2: Preservation** - Legitimate Routing Behavior Unchanged
     - **IMPORTANT**: Re-run the SAME tests from task 2 - do NOT write new tests
     - Run preservation property tests from step 2
@@ -77,7 +77,7 @@ Fix the substring bypass vulnerability in `getTargetFromProxyTable()` in `src/ro
     - Confirm all tests still pass after fix (no regressions)
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
 
-- [ ] 4. Checkpoint - Ensure all tests pass
+- [-] 4. Checkpoint - Ensure all tests pass
   - Run full test suite to confirm no regressions beyond the scope of this fix
   - Verify exploration test (Property 1) passes — bypass is prevented
   - Verify preservation tests (Property 2) pass — legitimate routing unchanged
