@@ -46,7 +46,7 @@ Fix the substring bypass vulnerability in `getTargetFromProxyTable()` in `src/ro
   - Mark task complete when tests are written, run, and passing on unfixed code
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
 
-- [ ] 3. Fix for router substring bypass vulnerability in getTargetFromProxyTable()
+- [x] 3. Fix for router substring bypass vulnerability in getTargetFromProxyTable()
 
   - [x] 3.1 Implement the three-branch key classifier fix
     - Replace the single `hostAndPath.indexOf(key) > -1` check with a three-branch classifier in `src/router.ts` `getTargetFromProxyTable()`:
