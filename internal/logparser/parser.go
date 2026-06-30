@@ -179,7 +179,7 @@ func parseJSON(r io.Reader) ([]Entry, error) {
 			Timestamp     string  `json:"timestamp"`
 			ErrorSeverity string  `json:"error_severity"`
 			Message       string  `json:"message"`
-			DurationMs    float64 `json:"duration_ms,omitempty"`
+			DurationMs    float64 `json:"duration_ms,omitzero"`
 		}
 		if err := dec.Decode(&rec); err == io.EOF {
 			break

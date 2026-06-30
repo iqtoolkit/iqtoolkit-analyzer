@@ -1,6 +1,7 @@
 package dbconn
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"time"
@@ -15,11 +16,7 @@ type Conn struct {
 }
 
 func (c *Conn) queryCtx(ctx context.Context) (context.Context, context.CancelFunc) {
-	t := c.QueryTimeout
-	if t <= 0 {
-		t = 30 * time.Second
-	}
-	return context.WithTimeoutCause(ctx, t, errors.New("dbconn: query timed out"))
+	return context.WithTimeoutCause(ctx, cmp.Or(c.QueryTimeout, 30*time.Second), errors.New("dbconn: query timed out"))
 }
 
 type Setting struct {

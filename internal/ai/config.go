@@ -9,10 +9,10 @@ import (
 
 // Config holds API keys for all supported providers.
 type Config struct {
-	OpenAIKey    string `json:"openai_api_key"`
-	AnthropicKey string `json:"anthropic_api_key"`
-	GeminiKey    string `json:"gemini_api_key"`
-	AWSRegion    string `json:"aws_region"` // for Kiro/Bedrock
+	OpenAIKey    string `json:"openai_api_key,omitzero"`
+	AnthropicKey string `json:"anthropic_api_key,omitzero"`
+	GeminiKey    string `json:"gemini_api_key,omitzero"`
+	AWSRegion    string `json:"aws_region,omitzero"` // for Kiro/Bedrock
 }
 
 // LoadConfig loads API keys from environment variables, falling back to

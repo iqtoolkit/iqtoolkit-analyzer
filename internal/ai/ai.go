@@ -3,6 +3,7 @@ package ai
 
 import (
 	"bytes"
+	"cmp"
 	"context"
 	"encoding/json"
 	"errors"
@@ -65,10 +66,7 @@ type Request struct {
 }
 
 func (r Request) maxTokens() int {
-	if r.MaxTokens > 0 {
-		return r.MaxTokens
-	}
-	return 4096
+	return cmp.Or(r.MaxTokens, 4096)
 }
 
 // HTTPError is returned when a provider responds with a non-200 status.
@@ -134,10 +132,7 @@ func (c *Client) maxRetries() int {
 }
 
 func (c *Client) timeout() time.Duration {
-	if c.Timeout > 0 {
-		return c.Timeout
-	}
-	return 60 * time.Second
+	return cmp.Or(c.Timeout, 60*time.Second)
 }
 
 func isRetryable(err error) bool {

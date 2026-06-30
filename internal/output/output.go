@@ -27,7 +27,7 @@ type jsonSummary struct {
 	ErrorCount    int    `json:"error_count"`
 	SlowQueries   int    `json:"slow_queries"`
 	AvgDuration   string `json:"avg_duration"`
-	PeakErrorTime string `json:"peak_error_time,omitempty"`
+	PeakErrorTime string `json:"peak_error_time,omitzero"`
 }
 
 type jsonRecommendation struct {
@@ -44,9 +44,9 @@ type jsonSlowQuery struct {
 
 type jsonReport struct {
 	Summary           jsonSummary          `json:"summary"`
-	SlowQueries       []jsonSlowQuery      `json:"slow_queries,omitempty"`
+	SlowQueries       []jsonSlowQuery      `json:"slow_queries,omitzero"`
 	Recommendations   []jsonRecommendation `json:"recommendations"`
-	AIRecommendations string               `json:"ai_recommendations,omitempty"`
+	AIRecommendations string               `json:"ai_recommendations,omitzero"`
 }
 
 // maxSlowQueries limits how many slow queries are rendered in reports.

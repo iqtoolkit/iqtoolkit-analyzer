@@ -2,6 +2,7 @@ package dbconn
 
 import (
 	"context"
+	"errors"
 	"os"
 	"strings"
 	"testing"
@@ -17,7 +18,7 @@ func testConn(t *testing.T) *Conn {
 	if dsn == "" {
 		t.Skip("TEST_DATABASE_URL not set; skipping integration test")
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeoutCause(t.Context(), 15*time.Second, errors.New("test: connection timed out"))
 	t.Cleanup(cancel)
 	conn, err := Connect(ctx, dsn)
 	if err != nil {
@@ -29,7 +30,7 @@ func testConn(t *testing.T) *Conn {
 
 func TestVersion(t *testing.T) {
 	conn := testConn(t)
-	v, err := conn.Version(context.Background())
+	v, err := conn.Version(t.Context())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -40,7 +41,7 @@ func TestVersion(t *testing.T) {
 
 func TestSettings(t *testing.T) {
 	conn := testConn(t)
-	settings, err := conn.Settings(context.Background())
+	settings, err := conn.Settings(t.Context())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -63,7 +64,7 @@ func TestSettings(t *testing.T) {
 
 func TestExtensions(t *testing.T) {
 	conn := testConn(t)
-	exts, err := conn.Extensions(context.Background())
+	exts, err := conn.Extensions(t.Context())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -75,7 +76,7 @@ func TestExtensions(t *testing.T) {
 func TestCheckExtension(t *testing.T) {
 	conn := testConn(t)
 	// plpgsql is installed by default in every PostgreSQL database.
-	status, err := conn.CheckExtension(context.Background(), "plpgsql")
+	status, err := conn.CheckExtension(t.Context(), "plpgsql")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -83,7 +84,7 @@ func TestCheckExtension(t *testing.T) {
 		t.Error("plpgsql should be installed")
 	}
 
-	status, err = conn.CheckExtension(context.Background(), "definitely_not_a_real_extension")
+	status, err = conn.CheckExtension(t.Context(), "definitely_not_a_real_extension")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -95,14 +96,14 @@ func TestCheckExtension(t *testing.T) {
 func TestStatUserTables(t *testing.T) {
 	conn := testConn(t)
 	// Should not error even with no user tables.
-	if _, err := conn.StatUserTables(context.Background()); err != nil {
+	if _, err := conn.StatUserTables(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 }
 
 func TestStatUserIndexes(t *testing.T) {
 	conn := testConn(t)
-	if _, err := conn.StatUserIndexes(context.Background()); err != nil {
+	if _, err := conn.StatUserIndexes(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -110,7 +111,7 @@ func TestStatUserIndexes(t *testing.T) {
 func TestQueryTimeout(t *testing.T) {
 	conn := testConn(t)
 	conn.QueryTimeout = 1 * time.Nanosecond
-	if _, err := conn.Settings(context.Background()); err == nil {
+	if _, err := conn.Settings(t.Context()); err == nil {
 		t.Error("expected timeout error with 1ns QueryTimeout")
 	}
 }
