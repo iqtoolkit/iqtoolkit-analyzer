@@ -107,7 +107,7 @@ func (c *Client) Complete(ctx context.Context, req Request) (*Response, error) {
 	var resp *Response
 	var err error
 	for attempt := range c.maxRetries() {
-		reqCtx, cancel := context.WithTimeout(ctx, c.timeout())
+		reqCtx, cancel := context.WithTimeoutCause(ctx, c.timeout(), errors.New("ai: request timed out"))
 		resp, err = c.dispatch(reqCtx, req)
 		cancel()
 		if err == nil {
@@ -142,13 +142,11 @@ func (c *Client) timeout() time.Duration {
 
 func isRetryable(err error) bool {
 	// HTTP-level errors: retry on rate limits (429) and server errors (5xx).
-	var he *HTTPError
-	if errors.As(err, &he) {
+	if he, ok := errors.AsType[*HTTPError](err); ok {
 		return he.StatusCode == http.StatusTooManyRequests || he.StatusCode >= 500
 	}
 	// Network-level errors: timeouts and dropped connections.
-	var ne net.Error
-	if errors.As(err, &ne) && ne.Timeout() {
+	if ne, ok := errors.AsType[net.Error](err); ok && ne.Timeout() {
 		return true
 	}
 	if errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF) || errors.Is(err, syscall.ECONNREFUSED) || errors.Is(err, syscall.ECONNRESET) {
@@ -351,11 +349,10 @@ func (c *Client) completeKiro(ctx context.Context, req Request) (*Response, erro
 		})
 	}
 
-	maxTokens := int32(req.maxTokens())
 	input := &bedrockruntime.ConverseInput{
 		ModelId:         aws.String(req.Model),
 		Messages:        msgs,
-		InferenceConfig: &types.InferenceConfiguration{MaxTokens: &maxTokens},
+		InferenceConfig: &types.InferenceConfiguration{MaxTokens: new(int32(req.maxTokens()))},
 	}
 	if req.System != "" {
 		input.System = []types.SystemContentBlock{&types.SystemContentBlockMemberText{Value: req.System}}

@@ -2,6 +2,7 @@ package dbconn
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -18,7 +19,7 @@ func (c *Conn) queryCtx(ctx context.Context) (context.Context, context.CancelFun
 	if t <= 0 {
 		t = 30 * time.Second
 	}
-	return context.WithTimeout(ctx, t)
+	return context.WithTimeoutCause(ctx, t, errors.New("dbconn: query timed out"))
 }
 
 type Setting struct {
@@ -28,7 +29,7 @@ type Setting struct {
 }
 
 func Connect(ctx context.Context, dsn string) (*Conn, error) {
-	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	ctx, cancel := context.WithTimeoutCause(ctx, 10*time.Second, errors.New("dbconn: connection timed out"))
 	defer cancel()
 	conn, err := pgx.Connect(ctx, dsn)
 	if err != nil {
@@ -91,5 +92,3 @@ func (c *Conn) Settings(ctx context.Context) ([]Setting, error) {
 	}
 	return settings, rows.Err()
 }
-
-

@@ -88,7 +88,7 @@ func TestCompleteOpenAI(t *testing.T) {
 
 	c := NewClient(OpenAI, "sk-test")
 	c.HTTPClient = redirectClient(ts)
-	resp, err := c.Complete(context.Background(), Request{
+	resp, err := c.Complete(t.Context(), Request{
 		Model:    "gpt-4o",
 		System:   "be brief",
 		Messages: []Message{{Role: "user", Content: "hi"}},
@@ -127,7 +127,7 @@ func TestCompleteAnthropic(t *testing.T) {
 
 	c := NewClient(Anthropic, "ak-test")
 	c.HTTPClient = redirectClient(ts)
-	resp, err := c.Complete(context.Background(), Request{
+	resp, err := c.Complete(t.Context(), Request{
 		Model:    "claude-sonnet-4-5",
 		System:   "sys",
 		Messages: []Message{{Role: "user", Content: "hi"}},
@@ -148,7 +148,7 @@ func TestCompleteGemini(t *testing.T) {
 
 	c := NewClient(Gemini, "gk-test")
 	c.HTTPClient = redirectClient(ts)
-	resp, err := c.Complete(context.Background(), Request{
+	resp, err := c.Complete(t.Context(), Request{
 		Model:    "gemini-2.5-pro",
 		Messages: []Message{{Role: "user", Content: "hi"}},
 	})
@@ -175,7 +175,7 @@ func TestCompleteRetriesOn429(t *testing.T) {
 	c := NewClient(OpenAI, "k")
 	c.HTTPClient = redirectClient(ts)
 	c.Timeout = 5 * time.Second
-	resp, err := c.Complete(context.Background(), Request{Model: "m", Messages: []Message{{Role: "user", Content: "x"}}})
+	resp, err := c.Complete(t.Context(), Request{Model: "m", Messages: []Message{{Role: "user", Content: "x"}}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -197,7 +197,7 @@ func TestCompleteDoesNotRetryOn401(t *testing.T) {
 
 	c := NewClient(OpenAI, "bad")
 	c.HTTPClient = redirectClient(ts)
-	_, err := c.Complete(context.Background(), Request{Model: "m", Messages: []Message{{Role: "user", Content: "x"}}})
+	_, err := c.Complete(t.Context(), Request{Model: "m", Messages: []Message{{Role: "user", Content: "x"}}})
 	if err == nil {
 		t.Fatal("expected error")
 	}
@@ -208,7 +208,7 @@ func TestCompleteDoesNotRetryOn401(t *testing.T) {
 
 func TestCompleteUnsupportedProvider(t *testing.T) {
 	c := NewClient(Provider("bogus"), "")
-	_, err := c.Complete(context.Background(), Request{Model: "m"})
+	_, err := c.Complete(t.Context(), Request{Model: "m"})
 	if err == nil || !strings.Contains(err.Error(), "unsupported provider") {
 		t.Errorf("err = %v", err)
 	}
