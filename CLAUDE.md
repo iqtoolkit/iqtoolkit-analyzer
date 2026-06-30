@@ -12,6 +12,10 @@ PostgreSQL health checking and performance tuning recommendations CLI (Go).
 - **Autovacuum must NEVER be disabled.** Recommendation text for `autovacuum = off` is unconditionally critical — no caveats or escape hatches ("unless you run manual vacuums" etc.).
 - Recommendation messages should be firm and opinionated when DBA consensus is clear, and always include the actual numbers so users can judge urgency.
 
+## Changelog
+
+- **Router substring bypass fix** — Fixed security vulnerability in `getTargetFromProxyTable()` in `src/router.ts`. Replaced unanchored `indexOf` check with a three-branch key classifier (path-only, host+path, host-only) that enforces exact host matching. Prevents crafted Host headers from bypassing routing boundaries. Spec: `.kiro/specs/router-substring-bypass-fix/`
+
 ## Roadmap (future releases)
 
 - **Configurable rule thresholds** — currently hardcoded in `internal/recommendations/recommendations.go`:
