@@ -6,7 +6,7 @@ Fix the substring bypass vulnerability in `getTargetFromProxyTable()` in `src/ro
 
 ## Tasks
 
-- [-] 1. Write bug condition exploration test
+- [x] 1. Write bug condition exploration test
   - **Property 1: Bug Condition** - Substring Bypass Allows Routing to Unintended Backend
   - **CRITICAL**: This test MUST FAIL on unfixed code - failure confirms the bug exists
   - **DO NOT attempt to fix the test or the code when it fails**
