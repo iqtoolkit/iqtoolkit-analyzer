@@ -60,7 +60,7 @@ Fix the substring bypass vulnerability in `getTargetFromProxyTable()` in `src/ro
     - _Preservation: FOR ALL X WHERE NOT isBugCondition(X): getTargetFromProxyTable(X) = getTargetFromProxyTable'(X)_
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.3, 3.4, 3.5_
 
-  - [-] 3.2 Verify bug condition exploration test now passes
+  - [x] 3.2 Verify bug condition exploration test now passes
     - **Property 1: Expected Behavior** - Substring Bypass Prevention Confirmed
     - **IMPORTANT**: Re-run the SAME test from task 1 - do NOT write a new test
     - The test from task 1 encodes the expected behavior (bypass attempts return undefined)
