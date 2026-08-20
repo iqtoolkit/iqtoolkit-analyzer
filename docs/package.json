@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "postinstall": "patch-package",
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
     "build": "docusaurus build",
@@ -25,7 +26,8 @@
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.10.1",
-    "@docusaurus/types": "3.10.1"
+    "@docusaurus/types": "3.10.1",
+    "patch-package": "^8.0.1"
   },
   "overrides": {
     "serialize-javascript": "^7.0.3",
