@@ -1,6 +1,6 @@
 module github.com/iqtoolkit/iqtoolkit-analyzer
 
-go 1.26.4
+go 1.26.6
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.42.1
@@ -28,5 +28,5 @@ require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/spf13/pflag v1.0.9 // indirect
-	golang.org/x/text v0.29.0 // indirect
+	golang.org/x/text v0.39.0 // indirect
 )
