@@ -1,0 +1,254 @@
+diff --git a/node_modules/image-size/dist/types/heif.cjs b/node_modules/image-size/dist/types/heif.cjs
+index 1f49078..5db2fda 100644
+--- a/node_modules/image-size/dist/types/heif.cjs
++++ b/node_modules/image-size/dist/types/heif.cjs
+@@ -6,9 +6,11 @@ var toUTF8String = (input, start = 0, end = input.length) => decoder.decode(inpu
+ var getView = (input, offset) => new DataView(input.buffer, input.byteOffset + offset);
+ var readUInt32BE = (input, offset = 0) => getView(input, offset).getUint32(0, false);
+ function readBox(input, offset) {
+-  if (input.length - offset < 4) return;
++  if (input.length - offset < 8) return;
+   const boxSize = readUInt32BE(input, offset);
+-  if (input.length - offset < boxSize) return;
++  if (boxSize !== 0 && input.length - offset < boxSize) return;
++  // Reject zero-size boxes to prevent infinite loops (CVE: image-size DoS)
++  if (boxSize === 0) return;
+   return {
+     name: toUTF8String(input, 4 + offset, 8 + offset),
+     offset,
+@@ -20,7 +22,8 @@ function findBox(input, boxName, currentOffset) {
+     const box = readBox(input, currentOffset);
+     if (!box) break;
+     if (box.name === boxName) return box;
+-    currentOffset += box.size > 0 ? box.size : 8;
++    if (box.size <= 0) break;
++    currentOffset += box.size;
+   }
+ }
+ 
+@@ -69,6 +72,7 @@ var HEIF = {
+         width = rawWidth - cropRight;
+       }
+       images.push({ height, width });
++      if (ispeBox.size <= 0) break;
+       currentOffset = ispeBox.offset + ispeBox.size;
+     }
+     if (images.length === 0) {
+diff --git a/node_modules/image-size/dist/types/heif.mjs b/node_modules/image-size/dist/types/heif.mjs
+index 0133091..bfed492 100644
+--- a/node_modules/image-size/dist/types/heif.mjs
++++ b/node_modules/image-size/dist/types/heif.mjs
+@@ -4,9 +4,11 @@ var toUTF8String = (input, start = 0, end = input.length) => decoder.decode(inpu
+ var getView = (input, offset) => new DataView(input.buffer, input.byteOffset + offset);
+ var readUInt32BE = (input, offset = 0) => getView(input, offset).getUint32(0, false);
+ function readBox(input, offset) {
+-  if (input.length - offset < 4) return;
++  if (input.length - offset < 8) return;
+   const boxSize = readUInt32BE(input, offset);
+-  if (input.length - offset < boxSize) return;
++  if (boxSize !== 0 && input.length - offset < boxSize) return;
++  // Reject zero-size boxes to prevent infinite loops (CVE: image-size DoS)
++  if (boxSize === 0) return;
+   return {
+     name: toUTF8String(input, 4 + offset, 8 + offset),
+     offset,
+@@ -18,7 +20,8 @@ function findBox(input, boxName, currentOffset) {
+     const box = readBox(input, currentOffset);
+     if (!box) break;
+     if (box.name === boxName) return box;
+-    currentOffset += box.size > 0 ? box.size : 8;
++    if (box.size <= 0) break;
++    currentOffset += box.size;
+   }
+ }
+ 
+@@ -67,6 +70,7 @@ var HEIF = {
+         width = rawWidth - cropRight;
+       }
+       images.push({ height, width });
++      if (ispeBox.size <= 0) break;
+       currentOffset = ispeBox.offset + ispeBox.size;
+     }
+     if (images.length === 0) {
+diff --git a/node_modules/image-size/dist/types/jp2.cjs b/node_modules/image-size/dist/types/jp2.cjs
+index cdd7c88..f4f566e 100644
+--- a/node_modules/image-size/dist/types/jp2.cjs
++++ b/node_modules/image-size/dist/types/jp2.cjs
+@@ -6,9 +6,10 @@ var toUTF8String = (input, start = 0, end = input.length) => decoder.decode(inpu
+ var getView = (input, offset) => new DataView(input.buffer, input.byteOffset + offset);
+ var readUInt32BE = (input, offset = 0) => getView(input, offset).getUint32(0, false);
+ function readBox(input, offset) {
+-  if (input.length - offset < 4) return;
++  if (input.length - offset < 8) return;
+   const boxSize = readUInt32BE(input, offset);
+-  if (input.length - offset < boxSize) return;
++  if (boxSize !== 0 && input.length - offset < boxSize) return;
++  if (boxSize === 0) return;
+   return {
+     name: toUTF8String(input, 4 + offset, 8 + offset),
+     offset,
+@@ -20,7 +21,8 @@ function findBox(input, boxName, currentOffset) {
+     const box = readBox(input, currentOffset);
+     if (!box) break;
+     if (box.name === boxName) return box;
+-    currentOffset += box.size > 0 ? box.size : 8;
++    if (box.size <= 0) break;
++    currentOffset += box.size;
+   }
+ }
+ 
+diff --git a/node_modules/image-size/dist/types/jp2.mjs b/node_modules/image-size/dist/types/jp2.mjs
+index 63a5376..3f4db41 100644
+--- a/node_modules/image-size/dist/types/jp2.mjs
++++ b/node_modules/image-size/dist/types/jp2.mjs
+@@ -4,9 +4,10 @@ var toUTF8String = (input, start = 0, end = input.length) => decoder.decode(inpu
+ var getView = (input, offset) => new DataView(input.buffer, input.byteOffset + offset);
+ var readUInt32BE = (input, offset = 0) => getView(input, offset).getUint32(0, false);
+ function readBox(input, offset) {
+-  if (input.length - offset < 4) return;
++  if (input.length - offset < 8) return;
+   const boxSize = readUInt32BE(input, offset);
+-  if (input.length - offset < boxSize) return;
++  if (boxSize !== 0 && input.length - offset < boxSize) return;
++  if (boxSize === 0) return;
+   return {
+     name: toUTF8String(input, 4 + offset, 8 + offset),
+     offset,
+@@ -18,7 +19,8 @@ function findBox(input, boxName, currentOffset) {
+     const box = readBox(input, currentOffset);
+     if (!box) break;
+     if (box.name === boxName) return box;
+-    currentOffset += box.size > 0 ? box.size : 8;
++    if (box.size <= 0) break;
++    currentOffset += box.size;
+   }
+ }
+ 
+diff --git a/node_modules/image-size/dist/types/jxl.cjs b/node_modules/image-size/dist/types/jxl.cjs
+index a12095b..bcbd466 100644
+--- a/node_modules/image-size/dist/types/jxl.cjs
++++ b/node_modules/image-size/dist/types/jxl.cjs
+@@ -47,9 +47,11 @@ var toHexString = (input, start = 0, end = input.length) => input.slice(start, e
+ var getView = (input, offset) => new DataView(input.buffer, input.byteOffset + offset);
+ var readUInt32BE = (input, offset = 0) => getView(input, offset).getUint32(0, false);
+ function readBox(input, offset) {
+-  if (input.length - offset < 4) return;
++  if (input.length - offset < 8) return;
+   const boxSize = readUInt32BE(input, offset);
+-  if (input.length - offset < boxSize) return;
++  if (boxSize !== 0 && input.length - offset < boxSize) return;
++  // Reject zero-size boxes to prevent infinite loops (CVE: image-size DoS)
++  if (boxSize === 0) return;
+   return {
+     name: toUTF8String(input, 4 + offset, 8 + offset),
+     offset,
+@@ -61,7 +63,8 @@ function findBox(input, boxName, currentOffset) {
+     const box = readBox(input, currentOffset);
+     if (!box) break;
+     if (box.name === boxName) return box;
+-    currentOffset += box.size > 0 ? box.size : 8;
++    if (box.size <= 0) break;
++    currentOffset += box.size;
+   }
+ }
+ 
+@@ -119,6 +122,7 @@ function extractPartialStreams(input) {
+     partialStreams.push(
+       input.slice(jxlpBox.offset + 12, jxlpBox.offset + jxlpBox.size)
+     );
++    if (jxlpBox.size <= 0) break;
+     offset = jxlpBox.offset + jxlpBox.size;
+   }
+   return partialStreams;
+diff --git a/node_modules/image-size/dist/types/jxl.mjs b/node_modules/image-size/dist/types/jxl.mjs
+index 49b0c4c..c85fd8b 100644
+--- a/node_modules/image-size/dist/types/jxl.mjs
++++ b/node_modules/image-size/dist/types/jxl.mjs
+@@ -45,9 +45,11 @@ var toHexString = (input, start = 0, end = input.length) => input.slice(start, e
+ var getView = (input, offset) => new DataView(input.buffer, input.byteOffset + offset);
+ var readUInt32BE = (input, offset = 0) => getView(input, offset).getUint32(0, false);
+ function readBox(input, offset) {
+-  if (input.length - offset < 4) return;
++  if (input.length - offset < 8) return;
+   const boxSize = readUInt32BE(input, offset);
+-  if (input.length - offset < boxSize) return;
++  if (boxSize !== 0 && input.length - offset < boxSize) return;
++  // Reject zero-size boxes to prevent infinite loops (CVE: image-size DoS)
++  if (boxSize === 0) return;
+   return {
+     name: toUTF8String(input, 4 + offset, 8 + offset),
+     offset,
+@@ -59,7 +61,8 @@ function findBox(input, boxName, currentOffset) {
+     const box = readBox(input, currentOffset);
+     if (!box) break;
+     if (box.name === boxName) return box;
+-    currentOffset += box.size > 0 ? box.size : 8;
++    if (box.size <= 0) break;
++    currentOffset += box.size;
+   }
+ }
+ 
+@@ -117,6 +120,7 @@ function extractPartialStreams(input) {
+     partialStreams.push(
+       input.slice(jxlpBox.offset + 12, jxlpBox.offset + jxlpBox.size)
+     );
++    if (jxlpBox.size <= 0) break;
+     offset = jxlpBox.offset + jxlpBox.size;
+   }
+   return partialStreams;
+diff --git a/node_modules/image-size/dist/types/utils.cjs b/node_modules/image-size/dist/types/utils.cjs
+index 23d52e4..f79cc33 100644
+--- a/node_modules/image-size/dist/types/utils.cjs
++++ b/node_modules/image-size/dist/types/utils.cjs
+@@ -28,9 +28,11 @@ function readUInt(input, bits, offset = 0, isBigEndian = false) {
+   return methods[methodName](input, offset);
+ }
+ function readBox(input, offset) {
+-  if (input.length - offset < 4) return;
++  if (input.length - offset < 8) return;
+   const boxSize = readUInt32BE(input, offset);
+-  if (input.length - offset < boxSize) return;
++  if (boxSize !== 0 && input.length - offset < boxSize) return;
++  // Reject zero-size boxes to prevent infinite loops (CVE: image-size DoS)
++  if (boxSize === 0) return;
+   return {
+     name: toUTF8String(input, 4 + offset, 8 + offset),
+     offset,
+@@ -42,7 +44,8 @@ function findBox(input, boxName, currentOffset) {
+     const box = readBox(input, currentOffset);
+     if (!box) break;
+     if (box.name === boxName) return box;
+-    currentOffset += box.size > 0 ? box.size : 8;
++    if (box.size <= 0) break;
++    currentOffset += box.size;
+   }
+ }
+ 
+diff --git a/node_modules/image-size/dist/types/utils.mjs b/node_modules/image-size/dist/types/utils.mjs
+index 3f09dce..4424b77 100644
+--- a/node_modules/image-size/dist/types/utils.mjs
++++ b/node_modules/image-size/dist/types/utils.mjs
+@@ -26,9 +26,11 @@ function readUInt(input, bits, offset = 0, isBigEndian = false) {
+   return methods[methodName](input, offset);
+ }
+ function readBox(input, offset) {
+-  if (input.length - offset < 4) return;
++  if (input.length - offset < 8) return;
+   const boxSize = readUInt32BE(input, offset);
+-  if (input.length - offset < boxSize) return;
++  if (boxSize !== 0 && input.length - offset < boxSize) return;
++  // Reject zero-size boxes to prevent infinite loops (CVE: image-size DoS)
++  if (boxSize === 0) return;
+   return {
+     name: toUTF8String(input, 4 + offset, 8 + offset),
+     offset,
+@@ -40,7 +42,8 @@ function findBox(input, boxName, currentOffset) {
+     const box = readBox(input, currentOffset);
+     if (!box) break;
+     if (box.name === boxName) return box;
+-    currentOffset += box.size > 0 ? box.size : 8;
++    if (box.size <= 0) break;
++    currentOffset += box.size;
+   }
+ }
+ 
